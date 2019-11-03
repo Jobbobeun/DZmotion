@@ -1,8 +1,12 @@
-// https://tronixstuff.com/2014/09/24/tutorial-serial-pcf8574-backpacks-hd44780-compatible-lcd-modules-arduino/ For downloading library.
+/* Project: DZ Motion 2020
+   Author:  Job Heijlighen
+   Date:    03-11-19
+   Version: 1.0
+*/
+
 #include <Wire.h>
-#include <LCD.h>
-#include <LiquidCrystal_I2C.h>
-#include <EEPROM.h>
+#include <LiquidCrystal_PCF8574.h>
+
 
 #define frequency_invertor_1_on_off 22
 #define frequency_invertor_1_direction 24
@@ -31,6 +35,10 @@
 #define down 1
 #define select 2
 
+// debug defines
+//#define DEBUG_HYDRAULIC
+//#define DEBUG_DETERMINE_ARRAYS
+
 int frequency_invertor_on_off[4];
 int frequency_invertor_direction[4];
 int frequency_invertor_state[4];
@@ -41,82 +49,132 @@ int hydraulic_close[4];
 int hydraulic_state[4];
 int hydraulic_time[4];
 
-int button_status[3];
+int button_state[3];
+int button_last_state[3];
 int button[3];
 int LCD_STATE;
+int LCD_STATE_OLD;
+bool LCD_TXT_UPDATE;
+int CYCLE_STATE = 0;
 
 
-LiquidCrystal_I2C  lcd(0x27, 2, 1, 0, 4, 5, 6, 7); // SDA --> D20 SCL --> D21 5v --> 5v GND --> GND
+LiquidCrystal_PCF8574 lcd(0x27);// SDA --> D20 SCL --> D21 5v --> 5v GND --> GND
 
+/************************************************************************************/
 void setup()
+/************************************************************************************/
 {
 
-  lcd.begin (16, 2); // for 16 x 2 LCD module
-  lcd.setBacklightPin(3, POSITIVE);
-  //LCD_LIGHT_ON();
+  Serial.begin(9600);
+  Wire.begin();
+  Wire.beginTransmission(0x27); //Your LCD Address
+  lcd.begin(20, 4); // initialize the lcd
+  LCD_LIGHT_ON();
+  LCD_STATE = 1;
+  update_lcd();
   determine_arrays();
 
 }
 
+/************************************************************************************/
 void loop()
+/************************************************************************************/
 {
 
+  check_buttons();
+  update_lcd();
+  cycle_state();
 }
 
+/************************************************************************************/
 void determine_arrays()   // Set all pins to array new outputs & inputs needs to be add here.
+/************************************************************************************/
 {
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("set hydraulic open");
+#endif
+
   // set hydraulic open
   hydraulic_open[1] = hydraulic_valve_1_open;
   hydraulic_open[2] = hydraulic_valve_2_open;
   hydraulic_open[3] = hydraulic_valve_3_open;
 
-  for (int i = 1 ; i = 3 ; i++) {
+  for (int i = 1 ; i < 4 ; i++) {
     pinMode(hydraulic_open[i], OUTPUT);
+    //digitalWrite(hydraulic_open[i],HIGH);
   }
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("set hydraulic close");
+#endif
 
   // set hydraulic close
   hydraulic_close[1] = hydraulic_valve_1_close;
   hydraulic_close[2] = hydraulic_valve_2_close;
   hydraulic_close[3] = hydraulic_valve_3_close;
 
-  for (int i = 1 ; i = 3 ; i++) {
+  for (int i = 1 ; i < 4 ; i++) {
     pinMode(hydraulic_close[i], OUTPUT);
+    // digitalWrite(hydraulic_close[i],HIGH);
   }
 
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("set hydraulic time");
+#endif
+
   // set hydraulic time
-  hydraulic_time[1] = hyfraulic_valve_1_time;
-  hydraulic_time[2] = hyfraulic_valve_2_time;
-  hydraulic_time[2] = hyfraulic_valve_2_time;
+  hydraulic_time[1] = hydraulic_valve_1_time;
+  hydraulic_time[2] = hydraulic_valve_2_time;
+  hydraulic_time[2] = hydraulic_valve_2_time;
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("set frequency invertor on");
+#endif
 
   // set frequency invertor on
   frequency_invertor_on_off[1] = frequency_invertor_1_on_off;
   frequency_invertor_on_off[2] = frequency_invertor_2_on_off;
   frequency_invertor_on_off[3] = frequency_invertor_3_on_off;
 
-  for (int i = 1 ; i = 3 ; i++) {
+
+  for (int i = 1 ; i < 4 ; i++) {
     pinMode(frequency_invertor_on_off[i], OUTPUT);
+    //  digitalWrite(frequency_invertor_on_off[i], HIGH);
   }
 
-  // set frequency invertor off
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("set frequency invertor direction");
+#endif
+
+  // set frequency invertor direction
   frequency_invertor_direction[1] = frequency_invertor_1_direction;
   frequency_invertor_direction[2] = frequency_invertor_2_direction;
   frequency_invertor_direction[3] = frequency_invertor_3_direction;
 
-  for (int i = 1 ; i = 3 ; i++) {
+  for (int i = 1 ; i < 4 ; i++) {
     pinMode(frequency_invertor_direction[i], OUTPUT);
+    //  digitalWrite(frequency_invertor_direction[i], HIGH);
   }
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("set buttons");
+#endif
 
   // set button
   button[up] = button_up;
   button[down] = button_down;
   button[select] = button_select;
 
-  for (int i = 0 ; i = 2 ; i++) {
-    pinMode(button[i], OUTPUT);
+  for (int i = 0 ; i < 3 ; i++) {
+    pinMode(button[i], INPUT);
   }
 
 }
 
-void update_eeprom() {
+/************************************************************************************/
+void update_eeprom()
+/************************************************************************************/
+{
 
 }
