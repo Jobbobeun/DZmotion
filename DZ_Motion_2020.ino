@@ -28,17 +28,20 @@
 #define hydraulic_valve_3_close 44
 #define hydraulic_valve_3_time 2000
 
-#define button_up 46
-#define button_down 48
-#define button_select 50
+#define button_up 31      
+#define button_down 33    
+#define button_select 35  
+#define button_stop 37
 #define up 0
 #define down 1
 #define select 2
+#define Stop 3
 
 // debug defines
 //#define DEBUG_HYDRAULIC
 //#define DEBUG_DETERMINE_ARRAYS
 
+// Global variables
 int frequency_invertor_on_off[4];
 int frequency_invertor_direction[4];
 int frequency_invertor_state[4];
@@ -49,14 +52,42 @@ int hydraulic_close[4];
 int hydraulic_state[4];
 int hydraulic_time[4];
 
-int button_state[3];
-int button_last_state[3];
-int button[3];
-int LCD_STATE;
+int button_state[4];
+int button_last_state[4];
+int button[4];
 int LCD_STATE_OLD;
-bool LCD_TXT_UPDATE;
-int CYCLE_STATE = 0;
+int LCD_SUB_RUN_OLD;
+bool first_update_lcd = true;
 
+bool AUTOMATIC_CYCLE_START = false;
+int AUTOMATIC_CYCLE_COUNTER;
+
+
+// Enum state machine
+enum LCD_STATE_ENUM {
+  LCD_STATE_WELCOME,
+  LCD_STATE_START,
+  LCD_STATE_SELECT,
+  LCD_STATE_SETTINGS
+};
+
+enum LCD_SUB_START_ENUM {
+  SUB_RUN_IDLE,
+  SUB_RUN_START,
+  SUB_RUN_STOP
+};
+
+enum MASTER_STATE_ENUM {
+  MASTER_STATE_IDLE,
+  MASTER_STATE_START,
+  MASTER_STATE_CYCLE_1,
+  MASTER_STATE_CYCLE_2,
+  MASTER_STATE_CYCLE_3
+};
+
+LCD_STATE_ENUM LCD_STATE;
+LCD_SUB_START_ENUM LCD_SUB_RUN;
+MASTER_STATE_ENUM MASTER_STATE;
 
 LiquidCrystal_PCF8574 lcd(0x27);// SDA --> D20 SCL --> D21 5v --> 5v GND --> GND
 
@@ -70,7 +101,7 @@ void setup()
   Wire.beginTransmission(0x27); //Your LCD Address
   lcd.begin(20, 4); // initialize the lcd
   LCD_LIGHT_ON();
-  LCD_STATE = 1;
+
   update_lcd();
   determine_arrays();
 
@@ -80,10 +111,12 @@ void setup()
 void loop()
 /************************************************************************************/
 {
+  
+    check_buttons();
+    update_lcd();
+    cycle_state();
 
-  check_buttons();
-  update_lcd();
-  cycle_state();
+
 }
 
 /************************************************************************************/
@@ -165,8 +198,9 @@ void determine_arrays()   // Set all pins to array new outputs & inputs needs to
   button[up] = button_up;
   button[down] = button_down;
   button[select] = button_select;
+  button[Stop] = button_stop;
 
-  for (int i = 0 ; i < 3 ; i++) {
+  for (int i = 0 ; i < 4 ; i++) {
     pinMode(button[i], INPUT);
   }
 
