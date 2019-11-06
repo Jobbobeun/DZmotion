@@ -1,14 +1,23 @@
 /************************************************************************************/
-void set_hydraulic_valve(int nr, bool state, bool reset)
+void set_hydraulic_valve(int nr, bool state, bool reset) // define which cylinder which control needed. New cylinders need to be add here.
 /************************************************************************************/
 {
   if (nr == 1) {
     set_hydraulic_valve_4_3(nr, state, reset);
+#if defined(DEBUG_HYDRAULIC)
+    Serial.println("SET VALVE 1");
+#endif
   } else if (nr == 2) {
     set_hydraulic_valve_2_2(nr, state, reset);
+#if defined(DEBUG_HYDRAULIC)
+    Serial.println("SET VALVE 2");
+#endif
   }
   else if (nr == 3) {
     set_hydraulic_valve_2_2(nr, state, reset);
+#if defined(DEBUG_HYDRAULIC)
+    Serial.println("SET VALVE 3");
+#endif
   }
 
 }
@@ -17,8 +26,10 @@ void set_hydraulic_valve(int nr, bool state, bool reset)
 void set_hydraulic_valve_2_2(int nr, bool state, bool reset)    // State true = Open, False = close --> Hydraulic_valve_open = direction  --> Hydraulic_valve_close = flow.
 /************************************************************************************/
 {
+
   if (reset == true) {
     digitalWrite(hydraulic_close[nr], LOW);
+    digitalWrite(hydraulic_open[nr], LOW);
     hydraulic_state[nr] = 3;
   }
   else {

@@ -28,18 +28,20 @@
 #define hydraulic_valve_3_close 44
 #define hydraulic_valve_3_time 2000
 
-#define button_up 31      
-#define button_down 33    
-#define button_select 35  
+#define button_up 31
+#define button_down 33
+#define button_select 35
 #define button_stop 37
 #define up 0
 #define down 1
 #define select 2
 #define Stop 3
+#define cylinder_amount 3
 
 // debug defines
 //#define DEBUG_HYDRAULIC
 //#define DEBUG_DETERMINE_ARRAYS
+//#define DEBUG_MANUAL_CONTROLE
 
 // Global variables
 int frequency_invertor_on_off[4];
@@ -55,10 +57,20 @@ int hydraulic_time[4];
 int button_state[4];
 int button_last_state[4];
 int button[4];
+
+// variable check LCD needs to be updated
 int LCD_STATE_OLD;
 int LCD_SUB_RUN_OLD;
-bool first_update_lcd = true;
+int LCD_SUB_MANUAL_HYDRAULIC_OLD;
+bool LCD_SUB_MANUAL_DIRECTION;
+int LCD_WELCOME_DZ_COUNTER;
+bool LCD_WELCOME_DZ_FLASH;
+bool LCD_WELCOME_DZ_FLASH_RESET = true;
 
+// LCD variables
+int sub_manual_cylinder_nr = 1;
+
+bool first_update_lcd = true;
 bool AUTOMATIC_CYCLE_START = false;
 int AUTOMATIC_CYCLE_COUNTER;
 
@@ -67,7 +79,8 @@ int AUTOMATIC_CYCLE_COUNTER;
 enum LCD_STATE_ENUM {
   LCD_STATE_WELCOME,
   LCD_STATE_START,
-  LCD_STATE_SELECT,
+  LCD_STATE_MANUAL_HYDRAULIC,
+  LCD_STATE_MANUAL_FREQUENCY_INVERTER,
   LCD_STATE_SETTINGS
 };
 
@@ -77,17 +90,34 @@ enum LCD_SUB_START_ENUM {
   SUB_RUN_STOP
 };
 
+enum LCD_SUB_MANUAL_HYDRAULIC_ENUM{
+  SUB_MANUAL_HYDRAULIC_IDLE,
+  SUB_MANUAL_HYDRAULIC_SET,
+  SUB_MANUAL_HYDRAULIC_RUN
+};
+
 enum MASTER_STATE_ENUM {
   MASTER_STATE_IDLE,
   MASTER_STATE_START,
   MASTER_STATE_CYCLE_1,
   MASTER_STATE_CYCLE_2,
-  MASTER_STATE_CYCLE_3
+  MASTER_STATE_CYCLE_3,
+  MASTER_STATE_STOP
 };
 
+
+enum MANUAL_CONTROL_VALVE_STATE_ENUM{
+  MANUAL_CONTROLE_VALVE_IDLE,
+  MANUAL_CONTROLE_VALVE_OUT,
+  MANUAL_CONTROLE_VALVE_IN,
+  MANUAL_CONTROLE_VALVE_STOP
+};
+
+LCD_SUB_MANUAL_HYDRAULIC_ENUM LCD_SUB_MANUAL_HYDRAULIC;
 LCD_STATE_ENUM LCD_STATE;
 LCD_SUB_START_ENUM LCD_SUB_RUN;
 MASTER_STATE_ENUM MASTER_STATE;
+MANUAL_CONTROL_VALVE_STATE_ENUM MANUAL_CONTROLE_VALVE_STATE;
 
 LiquidCrystal_PCF8574 lcd(0x27);// SDA --> D20 SCL --> D21 5v --> 5v GND --> GND
 
@@ -100,6 +130,8 @@ void setup()
   Wire.begin();
   Wire.beginTransmission(0x27); //Your LCD Address
   lcd.begin(20, 4); // initialize the lcd
+  lcd_start();
+  lcd.print("Loading");
   LCD_LIGHT_ON();
 
   update_lcd();
@@ -111,12 +143,12 @@ void setup()
 void loop()
 /************************************************************************************/
 {
-  
-    check_buttons();
-    update_lcd();
-    cycle_state();
 
-
+  check_buttons();
+  update_lcd();
+  cycle_state();
+ manual_control_valve();
+ 
 }
 
 /************************************************************************************/
