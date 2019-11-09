@@ -106,7 +106,10 @@ void cycle_state()
 
 }
 
-void manual_control_valve() {
+/************************************************************************************/
+void manual_control_valve()
+/************************************************************************************/
+{
 
 #if defined DEBUG_MANUAL_CONTROLE
   Serial.println(MANUAL_CONTROLE_VALVE_STATE);
@@ -145,4 +148,40 @@ void manual_control_valve() {
       break;
   }
 
+}
+
+/************************************************************************************/
+void Test_cycle()
+/************************************************************************************/
+{
+  if (test_cycle_start) {
+    for (int i = 1 ; i < (cylinder_amount + 1); i++) {
+
+      if (check_hydraulic_time(i) == false) {
+
+        troggel_hydraulic_direction(i);
+        hydraulic_actual_time[i] = 0;
+
+      } else {
+
+        if (cycle_test_approve_counter[i] == large_number_time_delay) { // solved issue with large numbers
+
+          hydraulic_actual_time[i]++;
+
+          cycle_test_approve_counter[i] = 0;
+
+        } else {
+          cycle_test_approve_counter[i]++ ;
+        }
+
+      }
+
+    }
+  } else {
+    for (int i = 1 ; i < (cylinder_amount + 1); i++) {
+    set_hydraulic_valve(i, true, false);
+    test_cycle_start = true;
+    }
+    
+  }
 }

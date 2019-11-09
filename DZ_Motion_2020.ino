@@ -20,13 +20,13 @@
 
 #define hydraulic_valve_1_open 34
 #define hydraulic_valve_1_close 36
-#define hydraulic_valve_1_time 2000
+#define hydraulic_valve_1_time 30000
 #define hydraulic_valve_2_open 38
 #define hydraulic_valve_2_close 40
-#define hydraulic_valve_2_time 2000
+#define hydraulic_valve_2_time 30000
 #define hydraulic_valve_3_open 42
 #define hydraulic_valve_3_close 44
-#define hydraulic_valve_3_time 2000
+#define hydraulic_valve_3_time 30000
 
 #define button_up 31
 #define button_down 33
@@ -37,6 +37,8 @@
 #define select 2
 #define Stop 3
 #define cylinder_amount 3
+#define frequency_inverter_amount 3
+#define large_number_time_delay 6
 
 // debug defines
 //#define DEBUG_HYDRAULIC
@@ -53,6 +55,7 @@ int hydraulic_open[4];
 int hydraulic_close[4];
 int hydraulic_state[4];
 int hydraulic_time[4];
+int hydraulic_actual_time[4];
 
 int button_state[4];
 int button_last_state[4];
@@ -62,18 +65,25 @@ int button[4];
 int LCD_STATE_OLD;
 int LCD_SUB_RUN_OLD;
 int LCD_SUB_MANUAL_HYDRAULIC_OLD;
+int LCD_SUB_MANUAL_FRQ_OLD;
 bool LCD_SUB_MANUAL_DIRECTION;
 int LCD_WELCOME_DZ_COUNTER;
 bool LCD_WELCOME_DZ_FLASH;
 bool LCD_WELCOME_DZ_FLASH_RESET = true;
+bool sub_manual_frequency_direction_old;
 
 // LCD variables
 int sub_manual_cylinder_nr = 1;
+int sub_manual_frequency_nr = 1;
+bool sub_manual_frequency_direction = true;
 
 bool first_update_lcd = true;
 bool AUTOMATIC_CYCLE_START = false;
 int AUTOMATIC_CYCLE_COUNTER;
 
+// Cycles variables
+int cycle_test_approve_counter[4];
+bool test_cycle_start = false;
 
 // Enum state machine
 enum LCD_STATE_ENUM {
@@ -90,10 +100,18 @@ enum LCD_SUB_START_ENUM {
   SUB_RUN_STOP
 };
 
-enum LCD_SUB_MANUAL_HYDRAULIC_ENUM{
+enum LCD_SUB_MANUAL_HYDRAULIC_ENUM {
   SUB_MANUAL_HYDRAULIC_IDLE,
   SUB_MANUAL_HYDRAULIC_SET,
   SUB_MANUAL_HYDRAULIC_RUN
+};
+
+enum LCD_SUB_MANUAL_FRQ_ENUM {
+  SUB_MANUAL_FRQ_IDLE,
+  SUB_MANUAL_FRQ_SET,
+  SUB_MANUAL_FRQ_DIRECTION,
+  SUB_MANUAL_FRQ_START,
+  SUB_MANUAL_FRQ_STOP
 };
 
 enum MASTER_STATE_ENUM {
@@ -106,13 +124,14 @@ enum MASTER_STATE_ENUM {
 };
 
 
-enum MANUAL_CONTROL_VALVE_STATE_ENUM{
+enum MANUAL_CONTROL_VALVE_STATE_ENUM {
   MANUAL_CONTROLE_VALVE_IDLE,
   MANUAL_CONTROLE_VALVE_OUT,
   MANUAL_CONTROLE_VALVE_IN,
   MANUAL_CONTROLE_VALVE_STOP
 };
 
+LCD_SUB_MANUAL_FRQ_ENUM LCD_SUB_MANUAL_FRQ;
 LCD_SUB_MANUAL_HYDRAULIC_ENUM LCD_SUB_MANUAL_HYDRAULIC;
 LCD_STATE_ENUM LCD_STATE;
 LCD_SUB_START_ENUM LCD_SUB_RUN;
@@ -147,8 +166,9 @@ void loop()
   check_buttons();
   update_lcd();
   cycle_state();
- manual_control_valve();
- 
+  manual_control_valve();
+  
+
 }
 
 /************************************************************************************/
@@ -191,7 +211,7 @@ void determine_arrays()   // Set all pins to array new outputs & inputs needs to
   // set hydraulic time
   hydraulic_time[1] = hydraulic_valve_1_time;
   hydraulic_time[2] = hydraulic_valve_2_time;
-  hydraulic_time[2] = hydraulic_valve_2_time;
+  hydraulic_time[3] = hydraulic_valve_3_time;
 
 #if defined(DEBUG_DETERMINE_ARRAYS)
   Serial.println("set frequency invertor on");

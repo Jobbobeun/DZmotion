@@ -104,8 +104,53 @@ void set_hydraulic_valve_4_3(int nr, bool state, bool reset)    // State true = 
 }
 
 /************************************************************************************/
-void check_hydraulic_time(int nr, int max_time)
+bool check_hydraulic_time(int nr) // true = smaler then actual time, false = bigger then actual time
 /************************************************************************************/
 {
+
+  if (hydraulic_time[nr] < hydraulic_actual_time[nr]) {
+
+#if defined(DEBUG_HYDRAULIC)
+    Serial.println("Over time");
+#endif
+
+    return false;
+
+  } else {
+
+#if defined(DEBUG_HYDRAULIC)
+    Serial.print("Time to go:");
+    Serial.println(hydraulic_time[nr] - hydraulic_actual_time[nr]);
+#endif
+
+    return true;
+
+  }
+}
+
+/************************************************************************************/
+void troggel_hydraulic_direction(int nr)
+/************************************************************************************/
+{
+  if (hydraulic_state[nr] == true) {
+
+    set_hydraulic_valve(nr, false, false);
+
+#if defined(DEBUG_HYDRAULIC)
+    Serial.println("Troggeld to close");
+#endif
+
+  } else if (hydraulic_state[nr] == false) {
+
+    set_hydraulic_valve(nr, true, false);
+
+#if defined(DEBUG_HYDRAULIC)
+    Serial.println("Troggeld to open");
+#endif
+
+  }else if (hydraulic_state[nr] == 3) {
+  error(1);
+  }
+
 
 }

@@ -114,7 +114,7 @@ void update_lcd()
           break;
 
         case SUB_MANUAL_HYDRAULIC_SET:
-        
+
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
             lcd.print("Cylinder:");
@@ -147,7 +147,9 @@ void update_lcd()
 
 
           break;
+
         case SUB_MANUAL_HYDRAULIC_RUN:
+
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
             lcd.print("Cylinder: ");
@@ -184,29 +186,132 @@ void update_lcd()
 
     case LCD_STATE_MANUAL_FREQUENCY_INVERTER:
 
-      if (CHECK_UPDATE_LCD()) {
-       lcd.print("Manual mode"); // set action after select case
+      switch (LCD_SUB_MANUAL_FRQ) {
+
+        case SUB_MANUAL_FRQ_IDLE:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Manual mode"); // set action after select case
             lcd.setCursor(0, 1);
             lcd.print("Frequency inverter");
-      }
+          }
 
-      if (LCD_BUTTON_DOWN()) {
-        LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
-      } else if (LCD_BUTTON_UP()) {
-        LCD_STATE = LCD_STATE_SETTINGS;
-      }
+          if (LCD_BUTTON_DOWN()) {
+            LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
+          } else if (LCD_BUTTON_UP()) {
+            LCD_STATE = LCD_STATE_SETTINGS;
+          } else if (LCD_BUTTON_SELECT()) {
+            LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_SET;
+          }
 
+          break;
+
+        case SUB_MANUAL_FRQ_SET:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Frq nr:");
+            lcd.setCursor(8, 0);
+            lcd.print(sub_manual_frequency_nr);
+          }
+          if (LCD_BUTTON_UP()) {
+            sub_manual_frequency_nr ++;
+            if (sub_manual_frequency_nr > frequency_inverter_amount) {
+              sub_manual_frequency_nr = 1;
+            }
+            lcd.setCursor(8, 0);
+            lcd.print(sub_manual_frequency_nr);
+          } else if (LCD_BUTTON_DOWN()) {
+            sub_manual_frequency_nr --;
+            if (sub_manual_frequency_nr < 1) {
+              sub_manual_frequency_nr = frequency_inverter_amount;
+            }
+            lcd.setCursor(8, 0);
+            lcd.print(sub_manual_frequency_nr);
+          } else if (LCD_BUTTON_SELECT()) {
+            LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_DIRECTION;
+          } else if (LCD_BUTTON_STOP()) {
+            LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_IDLE;
+          }
+
+          break;
+
+        case SUB_MANUAL_FRQ_DIRECTION:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Frq nr: ");
+            lcd.setCursor(8, 0);
+            lcd.print(sub_manual_frequency_nr);
+            lcd.setCursor(10, 0);
+            lcd.print("Direction: ");
+            if (sub_manual_frequency_direction) {
+              lcd.setCursor(0, 1);
+              lcd.print("Clockwise");
+            } else {
+              lcd.setCursor(0, 1);
+              lcd.print("Counterclockwise");
+            }
+          }
+
+          if (LCD_BUTTON_SELECT()) {
+            LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_START;
+          } else if (LCD_BUTTON_UP()) {
+            sub_manual_frequency_direction = true;
+          } else if (LCD_BUTTON_DOWN()) {
+            sub_manual_frequency_direction = false;
+          } else if (LCD_BUTTON_STOP()) {
+            LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_SET;
+          }
+
+
+          break;
+
+        case SUB_MANUAL_FRQ_START:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Frq nr: ");
+            lcd.setCursor(8, 0);
+            lcd.print(sub_manual_frequency_nr);
+            lcd.setCursor(10, 0);
+            lcd.print(" is ");
+            lcd.setCursor(0, 1);
+            lcd.print("now running");
+          }
+
+          set_frequency_inverter(sub_manual_frequency_nr, true, sub_manual_frequency_direction);
+          if (LCD_BUTTON_STOP()) {
+            LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_STOP;
+          }
+
+
+          break;
+
+        case SUB_MANUAL_FRQ_STOP:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Stop Frq nr:");
+            lcd.setCursor(13, 0);
+            lcd.print(sub_manual_frequency_nr);
+          }
+
+          set_frequency_inverter(sub_manual_frequency_nr, false, false);
+          LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_SET;
+          break;
+      }
       break;
+
     case LCD_STATE_SETTINGS:
 
       if (CHECK_UPDATE_LCD()) {
         lcd_start();
-        lcd.print("Settings"); // set action after select case
+        lcd.print("Settings / test cycle"); // set action after select case
       }
 
-      if (button_state[select]) {
-        MANUAL_CONTROLE_VALVE_STATE = MANUAL_CONTROLE_VALVE_OUT;
-      }
+      Test_cycle();
 
       if (LCD_BUTTON_DOWN()) {
         LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
@@ -217,24 +322,6 @@ void update_lcd()
   }
 }
 
-
-/************************************************************************************/
-void LCD_TOP(char text)
-/************************************************************************************/
-{
-  lcd.setBacklight(255);
-  lcd.home(); lcd.clear();
-  lcd.print(text);
-  lcd.setCursor(0, 1);    lcd.print(text);
-}
-
-/************************************************************************************/
-void LCD_BOTTOM(char text)
-/************************************************************************************/
-{
-  lcd.setCursor(0, 1);
-  lcd.print(text);
-}
 
 /************************************************************************************/
 void LCD_LIGHT_ON()
@@ -349,10 +436,34 @@ bool CHECK_UPDATE_LCD()
   } else if (LCD_SUB_MANUAL_HYDRAULIC != LCD_SUB_MANUAL_HYDRAULIC_OLD) {
     LCD_SUB_MANUAL_HYDRAULIC_OLD = LCD_SUB_MANUAL_HYDRAULIC;
     return true;
+  } else if (LCD_SUB_MANUAL_FRQ != LCD_SUB_MANUAL_FRQ_OLD) {
+    LCD_SUB_MANUAL_FRQ_OLD = LCD_SUB_MANUAL_FRQ;
+    return true;
+  } else if (sub_manual_frequency_direction != sub_manual_frequency_direction_old) {
+    sub_manual_frequency_direction_old = sub_manual_frequency_direction;
+    return true;
   }
   else {
     return false;
   }
 
+
+}
+
+/************************************************************************************/
+void error(int error_nr)
+/************************************************************************************/
+{
+  lcd_start();
+  switch (error_nr) {
+
+    case 1:
+
+      lcd.print("Troggel Hydraulic direction");
+      lcd.setCursor(0, 1);
+      lcd.print("ERROR state in reset.");
+      
+      break;
+  }
 
 }
