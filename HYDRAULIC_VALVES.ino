@@ -30,7 +30,7 @@ void set_hydraulic_valve_2_2(int nr, bool state, bool reset)    // State true = 
   if (reset == true) {
     digitalWrite(hydraulic_close[nr], LOW);
     digitalWrite(hydraulic_open[nr], LOW);
-    hydraulic_state[nr] = 3;
+    hydraulic_state[nr] = 3;       
   }
   else {
     digitalWrite(hydraulic_close[nr], HIGH);
@@ -149,8 +149,19 @@ void troggel_hydraulic_direction(int nr)
 #endif
 
   }else if (hydraulic_state[nr] == 3) {
-  error(1);
+  error_nr = 1;
   }
 
 
+}
+
+/************************************************************************************/
+void stop_all_hydraulic()
+/************************************************************************************/
+{
+  
+    for (int i = 1 ; i < (cylinder_amount + 1) ; i++){
+
+    set_hydraulic_valve(i , false, true);
+    }
 }
