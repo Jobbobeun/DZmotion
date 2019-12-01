@@ -27,6 +27,15 @@
 #define hydraulic_valve_3_open 42
 #define hydraulic_valve_3_close 44
 
+#define relay_1 46
+#define relay_2 48
+#define relay_3 50
+#define relay_4 52
+
+#define small_motor_system 53
+#define stewardplatform 51
+#define empty_relay 49
+
 
 #define button_up 31
 #define button_down 33
@@ -42,6 +51,7 @@
 #define frequency_inverter_amount 3
 #define large_number_time_delay 6
 #define settings_accuracy 500
+#define other_components_amount 7
 
 // define eeprom addresses
 #define eeprom_automatic_homeing_time 0 // 4 positions needed
@@ -61,9 +71,10 @@
 
 // debug defines
 //#define DEBUG_HYDRAULIC
-//#define DEBUG_DETERMINE_ARRAYS
+#define DEBUG_DETERMINE_ARRAYS
 //#define DEBUG_MANUAL_CONTROLE
 //#define DEBUG_AUTOMATIC_MODE
+#define DEBUG_EEPROM
 
 // Global variables
 int frequency_invertor_on_off[4];
@@ -76,6 +87,8 @@ int hydraulic_close[4];
 int hydraulic_state[4];
 int hydraulic_time[4];
 int hydraulic_actual_time[4];
+int fase_relay[5];
+int fase_relay_state[5];
 
 int button_state[5];
 int button_last_state[5];
@@ -85,6 +98,7 @@ int button[5];
 int LCD_STATE_OLD;
 int LCD_SUB_RUN_OLD;
 int LCD_SUB_MANUAL_HYDRAULIC_OLD;
+int LCD_SUB_MANUAL_OTHER_OLD;
 int LCD_SUB_MANUAL_FRQ_OLD;
 int LCD_SUB_SETTINGS_OLD;
 bool LCD_SUB_MANUAL_DIRECTION;
@@ -95,11 +109,13 @@ bool sub_manual_frequency_direction_old;
 int automatic_homeing_time_old;
 int check_buttons_delay;
 int error_nr_old;
+int sub_manual_other_component_nr_old;
 
 // LCD variables
 int sub_manual_cylinder_nr = 1;
 int sub_manual_frequency_nr = 1;
 bool sub_manual_frequency_direction = true;
+int sub_manual_other_component_nr =1;
 
 bool first_update_lcd = true;
 bool AUTOMATIC_CYCLE_START = false;
@@ -122,12 +138,16 @@ long automatic_mode_pause_time_counter;
 // Settings variables
 bool edit_mode = false;
 
+// Test function
+int counter_test;
+
 // Enum state machine
 enum LCD_STATE_ENUM {
   LCD_STATE_WELCOME,
   LCD_STATE_START,
   LCD_STATE_MANUAL_HYDRAULIC,
   LCD_STATE_MANUAL_FREQUENCY_INVERTER,
+  LCD_STATE_MANUAL_OTHER,
   LCD_STATE_SETTINGS
 };
 
@@ -151,6 +171,11 @@ enum LCD_SUB_MANUAL_FRQ_ENUM {
   SUB_MANUAL_FRQ_STOP
 };
 
+enum LCD_SUB_MANUAL_OTHER_ENUM{
+  SUB_MANUAL_OTHER_IDLE,
+  SUB_MANUAL_OTHER_SET,
+  SUB_MANUAL_OTHER_RUN
+};
 enum LCD_SUB_SETTINGS_ENUM {
   SUB_SETTINGS_IDLE,
   SUB_SETTINGS_AUTOMATIC_STARTUP_DELAY,
@@ -187,6 +212,7 @@ enum AUTOMATIC_MODE_STATE_ENUM {
   AUTOMATIC_MODE_STOP
 };
 
+LCD_SUB_MANUAL_OTHER_ENUM LCD_SUB_MANUAL_OTHER;
 LCD_SUB_SETTINGS_ENUM LCD_SUB_SETTINGS;
 AUTOMATIC_MODE_STATE_ENUM AUTOMATIC_MODE_STATE;
 LCD_SUB_MANUAL_FRQ_ENUM LCD_SUB_MANUAL_FRQ;
@@ -225,7 +251,9 @@ void loop()
   cycle_state();
   manual_control_valve();
   error();
-   }
+
+  // TEST_function();
+}
 
 /************************************************************************************/
 void determine_arrays(bool back_to_default)   // Set all pins to array new outputs & inputs needs to be add here.
@@ -245,19 +273,19 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
   Serial.println("set frequency startup delay to default");
 #endif
   frequency_invertor_startup_delay = frequency_invertor_startup_delay_default;
-  
+
 #if defined(DEBUG_DETERMINE_ARRAYS)
   Serial.println("set pause time to default");
 #endif
   automatic_mode_pause_time = automatic_mode_pause_time_default;
-  
+
 #if defined(DEBUG_DETERMINE_ARRAYS)
   Serial.println("set homeing delay to default");
 #endif
   automatic_homeing_time = automatic_homeing_time_default;
 
 
-  
+
   if (!back_to_default) {
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("set hydraulic open");
@@ -328,38 +356,26 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
     for (int i = 0 ; i < 5 ; i++) {
       pinMode(button[i], INPUT);
     }
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("set 3 fase relays");
+#endif
+
+    fase_relay[1] = relay_1;
+    fase_relay[2] = relay_2;
+    fase_relay[3] = relay_3;
+    fase_relay[4] = relay_4;
+
+    for (int i = 1 ; i < 6 ; i++) {
+      pinMode(fase_relay[i], OUTPUT);
+    }
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("set other relays");
+#endif
+    pinMode(small_motor_system, OUTPUT);
+    pinMode(stewardplatform, OUTPUT);
+    pinMode(empty_relay, OUTPUT);
+
   }
-}
-
-/************************************************************************************/
-void update_eeprom()
-/************************************************************************************/
-{
-
-  EEPROMWritelong(eeprom_automatic_homeing_time, automatic_homeing_time);
-  EEPROMWritelong(eeprom_hydraulic_valve_1_time, hydraulic_time[1]);
-  EEPROMWritelong(eeprom_hydraulic_valve_2_time, hydraulic_time[2]);
-  EEPROMWritelong(eeprom_hydraulic_valve_3_time, hydraulic_time[3]);
-  EEPROMWritelong(eeprom_frequency_invertor_startup_delay, frequency_invertor_startup_delay);
-  EEPROMWritelong(eeprom_automatic_mode_pause_time, automatic_mode_pause_time);
-
-}
-
-/************************************************************************************/
-void load_eeprom()
-/************************************************************************************/
-{
-  Serial.println("load eeprom:");
-  automatic_homeing_time = EEPROMReadlong(eeprom_automatic_homeing_time);
-  Serial.print("Load automatic_homeing_time:");  Serial.println(automatic_homeing_time);
-  hydraulic_time[1] = EEPROMReadlong(eeprom_hydraulic_valve_1_time);
-  Serial.print("Load hydraulic valve time 1:");  Serial.println(hydraulic_time[1]);
-  hydraulic_time[2] = EEPROMReadlong(eeprom_hydraulic_valve_2_time);
-  Serial.print("Load hydraulic valve time 2:");  Serial.println(hydraulic_time[2]);
-  hydraulic_time[3] = EEPROMReadlong(eeprom_hydraulic_valve_3_time);
-  Serial.print("Load hydraulic valve time 3:");  Serial.println(hydraulic_time[3]);
-  frequency_invertor_startup_delay = EEPROMReadlong(eeprom_frequency_invertor_startup_delay);
-  Serial.print("Load frequency_invertor_startup_delay:");  Serial.println(frequency_invertor_startup_delay);
-  automatic_mode_pause_time = EEPROMReadlong(eeprom_automatic_mode_pause_time);
-  Serial.print("Load automatic_mode_pause_time: "); Serial.print(automatic_mode_pause_time);
 }

@@ -4,6 +4,7 @@ void update_lcd()
 {
   switch (LCD_STATE) {
 
+    /*-----------------------------------------WELCOME----------------------------------*/
     case LCD_STATE_WELCOME: // Welcome state
 
       if (CHECK_UPDATE_LCD() || first_update_lcd) {
@@ -40,6 +41,7 @@ void update_lcd()
 
       break;
 
+    /*-----------------------------------------AUTOMATIC MODE----------------------------------*/
     case LCD_STATE_START:
 
       switch (LCD_SUB_RUN) {
@@ -59,7 +61,7 @@ void update_lcd()
           } else if (LCD_BUTTON_UP()) {
             LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
           } else if (LCD_BUTTON_DOWN()) {
-          //  LCD_STATE = LCD_STATE_WELCOME;
+            //  LCD_STATE = LCD_STATE_WELCOME;
           }
           /*-------------------------------*/
           break;
@@ -93,6 +95,8 @@ void update_lcd()
       }
 
       break;
+
+    /*-----------------------------------------MANUAL HYDRAULIC----------------------------------*/
     case LCD_STATE_MANUAL_HYDRAULIC:
 
       switch (LCD_SUB_MANUAL_HYDRAULIC) {
@@ -187,6 +191,8 @@ void update_lcd()
       }
       break;
 
+    /*-----------------------------------------MANUAL FREQUENCY INVERTER----------------------------------*/
+
     case LCD_STATE_MANUAL_FREQUENCY_INVERTER:
 
       switch (LCD_SUB_MANUAL_FRQ) {
@@ -203,7 +209,7 @@ void update_lcd()
           if (LCD_BUTTON_DOWN()) {
             LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
           } else if (LCD_BUTTON_UP()) {
-            LCD_STATE = LCD_STATE_SETTINGS;
+            LCD_STATE = LCD_STATE_MANUAL_OTHER;
           } else if (LCD_BUTTON_SELECT()) {
             LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_SET;
           }
@@ -307,6 +313,156 @@ void update_lcd()
       }
       break;
 
+    /*-----------------------------------------MANUAL OTHER----------------------------------*/
+    case LCD_STATE_MANUAL_OTHER:
+
+      switch (LCD_SUB_MANUAL_OTHER) {
+        case SUB_MANUAL_OTHER_IDLE:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Manual mode"); // set action after select case
+            lcd.setCursor(0, 1);
+            lcd.print("Other components");
+          }
+
+          if (LCD_BUTTON_DOWN()) {
+            LCD_STATE = LCD_STATE_MANUAL_FREQUENCY_INVERTER;
+          } else if (LCD_BUTTON_UP()) {
+            LCD_STATE = LCD_STATE_SETTINGS;
+          } else if (LCD_BUTTON_SELECT()) {
+            LCD_SUB_MANUAL_OTHER = SUB_MANUAL_OTHER_SET;
+          }
+
+
+          break;
+
+        case SUB_MANUAL_OTHER_SET:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Select component:"); // set action after select case
+            lcd.setCursor(0, 1);
+
+            switch (sub_manual_other_component_nr) {
+              case 1:
+                lcd.print("Relay 1");
+                break;
+
+              case 2:
+                lcd.print("Relay 2");
+                break;
+
+              case 3:
+                lcd.print("Relay 3");
+                break;
+
+              case 4:
+                lcd.print("Relay 4");
+                break;
+
+              case 5:
+                lcd.print("stewardplatform");
+                break;
+
+              case 6:
+                lcd.print("12V motors");
+                break;
+
+              case 7:
+                lcd.print("EMPTY RELAY");
+                break;
+            }
+          }
+
+
+
+          if (LCD_BUTTON_DOWN()) {
+
+            sub_manual_other_component_nr --;
+            if (sub_manual_other_component_nr < 1) {
+              sub_manual_other_component_nr = other_components_amount;
+            }
+
+          } else if (LCD_BUTTON_UP()) {
+            sub_manual_other_component_nr++;
+            if (sub_manual_other_component_nr > other_components_amount) {
+              sub_manual_other_component_nr = 1;
+            }
+
+
+          } else if (LCD_BUTTON_SELECT()) {
+            LCD_SUB_MANUAL_OTHER = SUB_MANUAL_OTHER_RUN;
+          } else if (LCD_BUTTON_STOP()) {
+            LCD_SUB_MANUAL_OTHER = SUB_MANUAL_OTHER_IDLE;
+          }
+
+          break;
+
+        case SUB_MANUAL_OTHER_RUN:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("RUNNING:"); // set action after select case
+            lcd.setCursor(0, 1);
+
+            if (sub_manual_other_component_nr == 1) {
+              lcd.print("Relay 1");
+              controle_relay(sub_manual_other_component_nr, true);
+            } else if (sub_manual_other_component_nr == 2) {
+              lcd.print("Relay 2");
+              controle_relay(sub_manual_other_component_nr, true);
+            } else if (sub_manual_other_component_nr == 3) {
+              lcd.print("Relay 3");
+              controle_relay(sub_manual_other_component_nr, true);
+            } else if (sub_manual_other_component_nr == 4) {
+              lcd.print("Relay 4");
+              controle_relay(sub_manual_other_component_nr, true);
+            } else if (sub_manual_other_component_nr == 5) {
+              lcd.print("Stewardplatform");
+              controle_stewardplatform(true);
+            } else if (sub_manual_other_component_nr == 6) {
+              lcd.print("12V motors");
+              controle_12v_system(true);
+            } else if (sub_manual_other_component_nr == 7) {
+              lcd.print("Empty relay");
+            }
+
+          }
+
+
+          if (LCD_BUTTON_STOP()) {
+            LCD_SUB_MANUAL_OTHER = SUB_MANUAL_OTHER_SET;
+            if (sub_manual_other_component_nr == 1) {
+              lcd.print("Relay 1");
+              controle_relay(sub_manual_other_component_nr, false);
+            } else if (sub_manual_other_component_nr == 2) {
+              lcd.print("Relay 2");
+              controle_relay(sub_manual_other_component_nr, false);
+            } else if (sub_manual_other_component_nr == 3) {
+              lcd.print("Relay 3");
+              controle_relay(sub_manual_other_component_nr, false);
+            } else if (sub_manual_other_component_nr == 4) {
+              lcd.print("Relay 4");
+              controle_relay(sub_manual_other_component_nr, false);
+            } else if (sub_manual_other_component_nr == 5) {
+              lcd.print("Stewardplatform");
+              controle_stewardplatform(false);
+            } else if (sub_manual_other_component_nr == 6) {
+              lcd.print("12V motors");
+              controle_12v_system(false);
+            } else if (sub_manual_other_component_nr == 7) {
+              lcd.print("Empty relay");
+            }
+          }
+
+          break;
+
+      }
+
+      break;
+
+    /*-----------------------------------------SETTINGS--------------------------------------*/
     case LCD_STATE_SETTINGS:
 
       switch (LCD_SUB_SETTINGS) {
@@ -534,7 +690,7 @@ void update_lcd()
             }
           } else {
             if (LCD_BUTTON_UP()) {
- LCD_SUB_SETTINGS = SUB_SETTINGS_DEFAULT;
+              LCD_SUB_SETTINGS = SUB_SETTINGS_DEFAULT;
             } else if (LCD_BUTTON_DOWN()) {
               LCD_SUB_SETTINGS = SUB_SETTINGS_HYDRAULIC_VALVE_3;
             } else if (LCD_BUTTON_SELECT()) {
@@ -555,17 +711,17 @@ void update_lcd()
           }
 
           if (LCD_BUTTON_SELECT()) {
-            
+
             determine_arrays(true);
-            
+
           } else if (LCD_BUTTON_DOWN()) {
-            
+
             LCD_SUB_SETTINGS = SUB_SETTINGS_FREQUENCY_STARTUP_DELAY;
-            
+
           } else if (LCD_BUTTON_STOP()) {
-            
+
             LCD_SUB_SETTINGS = SUB_SETTINGS_SAVE;
-            
+
           }
           break;
 
@@ -743,7 +899,14 @@ bool CHECK_UPDATE_LCD()
   } else if (LCD_SUB_SETTINGS != LCD_SUB_SETTINGS_OLD) {
     LCD_SUB_SETTINGS_OLD = LCD_SUB_SETTINGS;
     return true;
-  }  else {
+  } else if (LCD_SUB_MANUAL_OTHER != LCD_SUB_MANUAL_OTHER_OLD) {
+    LCD_SUB_MANUAL_OTHER_OLD = LCD_SUB_MANUAL_OTHER;
+    return true;
+  } else if (sub_manual_other_component_nr != sub_manual_other_component_nr_old) {
+    sub_manual_other_component_nr_old = sub_manual_other_component_nr;
+    return true;
+  }
+  else {
     return false;
   }
 
@@ -756,10 +919,6 @@ void error()
 {
   // stop all
 
-
-
-
-
   switch (error_nr) {
 
     case 1:
@@ -768,10 +927,65 @@ void error()
         stop_all_hydraulic();
         lcd.print("Troggel Hydraulic direction");
         lcd.setCursor(0, 1);
-        lcd.print("ERROR state in reset.");
+        lcd.print("PRESS STOP TO RESET ERROR");
       }
 
       if (LCD_BUTTON_STOP()) {
+        state_idle();
+        error_nr = 0;
+        lcd_start();
+        lcd.print("ERROR RESET");
+        delay(2000);
+      }
+      break;
+
+    case 2:
+      if (CHECK_UPDATE_LCD()) {
+        lcd_start();
+        stop_all_hydraulic();
+        lcd.print("WRONG 12V SYSTEM COMMAND");
+        lcd.setCursor(0, 1);
+        lcd.print("PRESS STOP TO RESET ERROR");
+      }
+
+      if (LCD_BUTTON_STOP()) {
+        state_idle();
+        error_nr = 0;
+        lcd_start();
+        lcd.print("ERROR RESET");
+        delay(2000);
+      }
+      break;
+
+    case 3:
+      if (CHECK_UPDATE_LCD()) {
+        lcd_start();
+        stop_all_hydraulic();
+        lcd.print("WRONG 3 FASE RELAY COMMAND");
+        lcd.setCursor(0, 1);
+        lcd.print("PRESS STOP TO RESET ERROR");
+      }
+
+      if (LCD_BUTTON_STOP()) {
+        state_idle();
+        error_nr = 0;
+        lcd_start();
+        lcd.print("ERROR RESET");
+        delay(2000);
+      }
+      break;
+
+    case 4:
+      if (CHECK_UPDATE_LCD()) {
+        lcd_start();
+        stop_all_hydraulic();
+        lcd.print("WRONG STEWARDPLATFORM COMMAND");
+        lcd.setCursor(0, 1);
+        lcd.print("PRESS STOP TO RESET ERROR");
+      }
+
+      if (LCD_BUTTON_STOP()) {
+        state_idle();
         error_nr = 0;
         lcd_start();
         lcd.print("ERROR RESET");
@@ -779,5 +993,12 @@ void error()
       }
       break;
   }
+
+}
+
+/************************************************************************************/
+void state_idle()
+/************************************************************************************/
+{ // SET ALL STATES BACK TO IDLE --> NEEDS TO BE DONE!!!
 
 }
