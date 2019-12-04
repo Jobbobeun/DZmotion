@@ -8,7 +8,6 @@
 #include <LiquidCrystal_PCF8574.h>
 #include <EEPROM.h>
 
-
 #define frequency_invertor_1_on_off 22
 #define frequency_invertor_1_direction 24
 #define frequency_invertor_1_speed 2
@@ -36,7 +35,6 @@
 #define stewardplatform 51
 #define empty_relay 49
 
-
 #define button_up 31
 #define button_down 33
 #define button_select 35
@@ -60,6 +58,19 @@
 #define eeprom_hydraulic_valve_3_time 12 // 4 positions needed
 #define eeprom_frequency_invertor_startup_delay 16 // 4 positions needed
 #define eeprom_automatic_mode_pause_time 20 // 4 positions needed
+#define eeprom_automatic_mode_hydraulic_1 24 // 1 position needed
+#define eeprom_automatic_mode_hydraulic_2 25 // 1 position needed
+#define eeprom_automatic_mode_hydraulic_3 26 // 1 position needed
+#define eeprom_automatic_mode_frequency_1 27 // 1 position needed
+#define eeprom_automatic_mode_frequency_2 28 // 1 position needed
+#define eeprom_automatic_mode_frequency_3 29 // 1 position needed
+#define eeprom_automatic_mode_other_relay_1 30 // 1 position needed
+#define eeprom_automatic_mode_other_relay_2 31 // 1 position needed
+#define eeprom_automatic_mode_other_relay_3 32 // 1 position needed
+#define eeprom_automatic_mode_other_relay_4 33 // 1 position needed
+#define eeprom_automatic_mode_other_platform 34 // 1 position needed
+#define eeprom_automatic_mode_other_12V 35 // 1 position needed
+#define eeprom_automatic_mode_other_empty 36 // 1 position needed
 
 // default values
 #define hydraulic_valve_1_time_default 30000
@@ -101,6 +112,7 @@ int LCD_SUB_MANUAL_HYDRAULIC_OLD;
 int LCD_SUB_MANUAL_OTHER_OLD;
 int LCD_SUB_MANUAL_FRQ_OLD;
 int LCD_SUB_SETTINGS_OLD;
+int LCD_SUB_SETTINGS_ENABLE_OLD;
 bool LCD_SUB_MANUAL_DIRECTION;
 int LCD_WELCOME_DZ_COUNTER;
 bool LCD_WELCOME_DZ_FLASH;
@@ -115,7 +127,7 @@ int sub_manual_other_component_nr_old;
 int sub_manual_cylinder_nr = 1;
 int sub_manual_frequency_nr = 1;
 bool sub_manual_frequency_direction = true;
-int sub_manual_other_component_nr =1;
+int sub_manual_other_component_nr = 1;
 
 bool first_update_lcd = true;
 bool AUTOMATIC_CYCLE_START = false;
@@ -134,6 +146,10 @@ int frequency_invertor_startup_delay;
 bool automatic_frequency_inverter_running = false;
 long automatic_mode_pause_time;
 long automatic_mode_pause_time_counter;
+int automatic_mode_hydraulic_used[4];
+int automatic_mode_frequency_used[4];
+int automatic_mode_other_used[8];
+bool automatic_mode_homeing_enable;
 
 // Settings variables
 bool edit_mode = false;
@@ -171,7 +187,7 @@ enum LCD_SUB_MANUAL_FRQ_ENUM {
   SUB_MANUAL_FRQ_STOP
 };
 
-enum LCD_SUB_MANUAL_OTHER_ENUM{
+enum LCD_SUB_MANUAL_OTHER_ENUM {
   SUB_MANUAL_OTHER_IDLE,
   SUB_MANUAL_OTHER_SET,
   SUB_MANUAL_OTHER_RUN
@@ -183,9 +199,27 @@ enum LCD_SUB_SETTINGS_ENUM {
   SUB_SETTINGS_HYDRAULIC_VALVE_2,
   SUB_SETTINGS_HYDRAULIC_VALVE_3,
   SUB_SETTINGS_FREQUENCY_STARTUP_DELAY,
+  SUB_SETTINGS_ENABLE_FEATURE,
   SUB_SETTINGS_DEFAULT,
   SUB_SETTINGS_SAVE
 };
+
+enum LCD_SUB_SETTINGS_ENABLE_ENUM{
+  SUB_SETTINGS_ENABLE_IDLE,
+  SUB_SETTINGS_ENABLE_HYDRAULIC_1,
+  SUB_SETTINGS_ENABLE_HYDRAULIC_2,
+  SUB_SETTINGS_ENABLE_HYDRAULIC_3,
+  SUB_SETTINGS_ENABLE_FREQUENCY_1,
+  SUB_SETTINGS_ENABLE_FREQUENCY_2,
+  SUB_SETTINGS_ENABLE_FREQUENCY_3,
+  SUB_SETTINGS_ENABLE_RELAY_1,
+  SUB_SETTINGS_ENABLE_RELAY_2,
+  SUB_SETTINGS_ENABLE_RELAY_3,
+  SUB_SETTINGS_ENABLE_RELAY_4,
+  SUB_SETTINGS_ENABLE_PLATFORM,
+  SUB_SETTINGS_ENABLE_12V,
+  SUB_SETTINGS_ENABLE_EMPTY
+  };
 
 enum MASTER_STATE_ENUM {
   MASTER_STATE_IDLE,
@@ -212,6 +246,7 @@ enum AUTOMATIC_MODE_STATE_ENUM {
   AUTOMATIC_MODE_STOP
 };
 
+LCD_SUB_SETTINGS_ENABLE_ENUM LCD_SUB_SETTINGS_ENABLE;
 LCD_SUB_MANUAL_OTHER_ENUM LCD_SUB_MANUAL_OTHER;
 LCD_SUB_SETTINGS_ENUM LCD_SUB_SETTINGS;
 AUTOMATIC_MODE_STATE_ENUM AUTOMATIC_MODE_STATE;
@@ -284,9 +319,39 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
 #endif
   automatic_homeing_time = automatic_homeing_time_default;
 
+#if defined(DEBUG_DETERMINE_ARRAYS)
+  Serial.println("unable homeing function");
+#endif
+automatic_mode_homeing_enable = true;
 
+#if defined(DEBUG_DETERMINE_ARRAYS)
+Serial.println("Turnoff manual mode fixtures");
+#endif
+
+    for (int i = 0; i < 5 ; i++) {
+      automatic_mode_hydraulic_used[i] = 0;
+      automatic_mode_frequency_used[i] = 0;
+    }
+    for (int i = 0; i < 8 ; i++) {
+      automatic_mode_other_used[i] = 0;
+    }
+    
 
   if (!back_to_default) {
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+Serial.println("Set manual mode functions to 0");
+#endif
+
+    for (int i = 0; i < 5 ; i++) {
+      automatic_mode_hydraulic_used[i] = 0;
+      automatic_mode_frequency_used[i] = 0;
+    }
+    for (int i = 0; i < 8 ; i++) {
+      automatic_mode_other_used[i] = 0;
+    }
+    
+
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("set hydraulic open");
 #endif

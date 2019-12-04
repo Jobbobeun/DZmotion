@@ -2,6 +2,7 @@
 void update_lcd()
 /************************************************************************************/
 {
+  int update_var;
   switch (LCD_STATE) {
 
     /*-----------------------------------------WELCOME----------------------------------*/
@@ -480,7 +481,7 @@ void update_lcd()
           }
 
           break;
-
+        /***************************************************************************************/
         case SUB_SETTINGS_AUTOMATIC_STARTUP_DELAY:
 
           if (CHECK_UPDATE_LCD()) {
@@ -528,7 +529,7 @@ void update_lcd()
 
 
           break;
-
+        /***************************************************************************************/
         case SUB_SETTINGS_HYDRAULIC_VALVE_1:
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
@@ -571,7 +572,7 @@ void update_lcd()
             }
           }
           break;
-
+        /***************************************************************************************/
         case SUB_SETTINGS_HYDRAULIC_VALVE_2:
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
@@ -614,7 +615,7 @@ void update_lcd()
             }
           }
           break;
-
+        /***************************************************************************************/
         case SUB_SETTINGS_HYDRAULIC_VALVE_3:
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
@@ -659,7 +660,7 @@ void update_lcd()
             }
           }
           break;
-
+        /***************************************************************************************/
         case SUB_SETTINGS_FREQUENCY_STARTUP_DELAY:
 
           if (CHECK_UPDATE_LCD()) {
@@ -690,7 +691,7 @@ void update_lcd()
             }
           } else {
             if (LCD_BUTTON_UP()) {
-              LCD_SUB_SETTINGS = SUB_SETTINGS_DEFAULT;
+              LCD_SUB_SETTINGS = SUB_SETTINGS_ENABLE_FEATURE;
             } else if (LCD_BUTTON_DOWN()) {
               LCD_SUB_SETTINGS = SUB_SETTINGS_HYDRAULIC_VALVE_3;
             } else if (LCD_BUTTON_SELECT()) {
@@ -703,7 +704,497 @@ void update_lcd()
           }
 
           break;
+        /***************************************************************************************/
+        case SUB_SETTINGS_ENABLE_FEATURE:
 
+          switch (LCD_SUB_SETTINGS_ENABLE) {
+
+            case SUB_SETTINGS_ENABLE_IDLE:
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+              }
+
+              if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS = SUB_SETTINGS_DEFAULT;
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS = SUB_SETTINGS_FREQUENCY_STARTUP_DELAY;
+              } else if (LCD_BUTTON_SELECT()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_1;
+              } else if (LCD_BUTTON_STOP()) {
+                LCD_SUB_SETTINGS = SUB_SETTINGS_SAVE;
+              }
+
+              break;
+
+            case SUB_SETTINGS_ENABLE_HYDRAULIC_1:
+              update_var = automatic_mode_hydraulic_used[1];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Hydraulic 1:");
+                if (update_var == 1) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(13, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(13, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_IDLE;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_2;
+              }
+
+              automatic_mode_hydraulic_used[1] = update_var;
+
+              break;
+
+            case SUB_SETTINGS_ENABLE_HYDRAULIC_2:
+
+              update_var = automatic_mode_hydraulic_used[2];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Hydraulic 2:");
+                if (update_var == 1) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(13, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(13, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_1;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_3;
+              }
+
+              automatic_mode_hydraulic_used[2] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_HYDRAULIC_3:
+              update_var = automatic_mode_hydraulic_used[3];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Hydraulic 3:");
+                if (update_var == 1) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(13, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(13, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_2;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_FREQUENCY_1;
+              }
+
+              automatic_mode_hydraulic_used[3] = update_var;
+
+              break;
+
+            case SUB_SETTINGS_ENABLE_FREQUENCY_1:
+              update_var = automatic_mode_frequency_used[1];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Frequency 1:");
+                if (update_var == 1) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(13, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(13, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_3;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_FREQUENCY_2;
+              }
+
+              automatic_mode_frequency_used[1] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_FREQUENCY_2:
+              update_var = automatic_mode_frequency_used[2];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Frequency 2:");
+                if (update_var == 1) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(13, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(13, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_FREQUENCY_1;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_FREQUENCY_3;
+              }
+
+              automatic_mode_frequency_used[2] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_FREQUENCY_3:
+
+              update_var = automatic_mode_frequency_used[3];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Frequency 3:");
+                if (update_var == 1) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(13, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(13, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(13, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_FREQUENCY_2;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_1;
+              }
+
+              automatic_mode_frequency_used[3] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_RELAY_1:
+
+              update_var = automatic_mode_other_used[1];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Relay 1:");
+                if (update_var == 1) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(9, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(9, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_FREQUENCY_3;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_2;
+              }
+
+              automatic_mode_other_used[1] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_RELAY_2:
+              update_var = automatic_mode_other_used[2];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Relay 2:");
+                if (update_var == 1) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(9, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(9, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_1;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_3;
+              }
+
+              automatic_mode_other_used[2] = update_var;
+
+              break;
+
+            case SUB_SETTINGS_ENABLE_RELAY_3:
+              update_var = automatic_mode_other_used[3];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Relay 3:");
+                if (update_var == 1) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(9, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(9, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_2;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_4;
+              }
+
+              automatic_mode_other_used[3] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_RELAY_4:
+              update_var = automatic_mode_other_used[4];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Relay 4:");
+                if (update_var == 1) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(9, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(13, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(9, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(9, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_3;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_PLATFORM;
+              }
+
+              automatic_mode_other_used[4] = update_var;
+
+              break;
+
+            case SUB_SETTINGS_ENABLE_PLATFORM:
+              update_var = automatic_mode_other_used[5];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("Platform:");
+                if (update_var == 1) {
+                  lcd.setCursor(10, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(10, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(10, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(10, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(10, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_RELAY_4;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_12V;
+              }
+
+              automatic_mode_other_used[5] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_12V:
+
+              update_var = automatic_mode_other_used[6];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("12V system:");
+                if (update_var == 1) {
+                  lcd.setCursor(12, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(12, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(12, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(12, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(12, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_PLATFORM;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_EMPTY;
+              }
+
+              automatic_mode_other_used[6] = update_var;
+              break;
+
+            case SUB_SETTINGS_ENABLE_EMPTY:
+            
+              update_var = automatic_mode_other_used[7];
+              if (CHECK_UPDATE_LCD()) {
+                lcd_start();
+                lcd.print("Enable hardware");
+                lcd.setCursor(0, 1);
+                lcd.print("EMPTY:");
+                if (update_var == 1) {
+                  lcd.setCursor(7, 1);
+                  lcd.print("On");
+                } else if (update_var == 0) {
+                  lcd.setCursor(7, 1);
+                  lcd.print("Off");
+                } else {
+                  lcd.setCursor(7, 1);
+                  lcd.print("ERROR LOADING STATUS");
+                }
+              }
+              if (LCD_BUTTON_SELECT()) {
+                update_var = 1;
+                lcd.setCursor(7, 1);
+                lcd.print("On ");
+              } else if (LCD_BUTTON_STOP()) {
+                update_var = 0;
+                lcd.setCursor(7, 1);
+                lcd.print("Off");
+              } else if (LCD_BUTTON_DOWN()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_PLATFORM;
+              } else if (LCD_BUTTON_UP()) {
+                LCD_SUB_SETTINGS_ENABLE = SUB_SETTINGS_ENABLE_HYDRAULIC_1;
+              }
+
+              automatic_mode_other_used[7] = update_var;
+              break;
+
+          }
+
+          break;
+        /***************************************************************************************/
         case SUB_SETTINGS_DEFAULT:
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
@@ -715,8 +1206,8 @@ void update_lcd()
             determine_arrays(true);
 
           } else if (LCD_BUTTON_DOWN()) {
+            LCD_SUB_SETTINGS = SUB_SETTINGS_ENABLE_FEATURE;
 
-            LCD_SUB_SETTINGS = SUB_SETTINGS_FREQUENCY_STARTUP_DELAY;
 
           } else if (LCD_BUTTON_STOP()) {
 
@@ -905,6 +1396,9 @@ bool CHECK_UPDATE_LCD()
   } else if (sub_manual_other_component_nr != sub_manual_other_component_nr_old) {
     sub_manual_other_component_nr_old = sub_manual_other_component_nr;
     return true;
+  } else if (LCD_SUB_SETTINGS_ENABLE != LCD_SUB_SETTINGS_ENABLE_OLD) {
+    LCD_SUB_SETTINGS_ENABLE_OLD = LCD_SUB_SETTINGS_ENABLE;
+    return true;
   }
   else {
     return false;
@@ -996,11 +1490,13 @@ void error()
 
 }
 
+
+
 /************************************************************************************/
 void state_idle()
 /************************************************************************************/
-{ // SET ALL STATES BACK TO IDLE --> NEEDS TO BE DONE!!!
-  LCD_SUB_RUN = SUB_RUN_IDLE;  
+{
+  LCD_SUB_RUN = SUB_RUN_IDLE;
   LCD_SUB_MANUAL_HYDRAULIC = SUB_MANUAL_HYDRAULIC_IDLE;
   LCD_SUB_MANUAL_FRQ = SUB_MANUAL_FRQ_IDLE;
   LCD_SUB_MANUAL_OTHER = SUB_MANUAL_OTHER_IDLE;

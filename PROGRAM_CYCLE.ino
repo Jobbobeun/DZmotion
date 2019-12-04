@@ -348,16 +348,16 @@ void automatic_mode()
 }
 
 void TEST_function() {
-  
+int state = 1;
 
     for (int i = 1 ; i < 5 ; i ++) {
-      digitalWrite(fase_relay[i], LOW);
-      digitalWrite(hydraulic_open[i], LOW);
-      digitalWrite(hydraulic_close[i], LOW);
-      digitalWrite(frequency_invertor_on_off[i], LOW);
+      digitalWrite(fase_relay[i], state);
+      digitalWrite(hydraulic_open[i], state);
+      digitalWrite(hydraulic_close[i], state);
+      digitalWrite(frequency_invertor_on_off[i], state);
       }
-      digitalWrite(small_motor_system, LOW);
-      digitalWrite(stewardplatform, LOW);
-      digitalWrite(empty_relay, LOW);
+      digitalWrite(small_motor_system, state);
+      digitalWrite(stewardplatform, state);
+      digitalWrite(empty_relay, state);
 
 }
