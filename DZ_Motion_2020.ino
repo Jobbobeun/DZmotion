@@ -71,6 +71,8 @@
 #define eeprom_automatic_mode_other_platform 34 // 1 position needed
 #define eeprom_automatic_mode_other_12V 35 // 1 position needed
 #define eeprom_automatic_mode_other_empty 36 // 1 position needed
+#define eeprom_automatic_mode_homing_enable 37 // 1 position needed
+
 
 // default values
 #define hydraulic_valve_1_time_default 30000
@@ -200,11 +202,12 @@ enum LCD_SUB_SETTINGS_ENUM {
   SUB_SETTINGS_HYDRAULIC_VALVE_3,
   SUB_SETTINGS_FREQUENCY_STARTUP_DELAY,
   SUB_SETTINGS_ENABLE_FEATURE,
+  SUB_SETTINGS_HOMEING,
   SUB_SETTINGS_DEFAULT,
   SUB_SETTINGS_SAVE
 };
 
-enum LCD_SUB_SETTINGS_ENABLE_ENUM{
+enum LCD_SUB_SETTINGS_ENABLE_ENUM {
   SUB_SETTINGS_ENABLE_IDLE,
   SUB_SETTINGS_ENABLE_HYDRAULIC_1,
   SUB_SETTINGS_ENABLE_HYDRAULIC_2,
@@ -219,7 +222,7 @@ enum LCD_SUB_SETTINGS_ENABLE_ENUM{
   SUB_SETTINGS_ENABLE_PLATFORM,
   SUB_SETTINGS_ENABLE_12V,
   SUB_SETTINGS_ENABLE_EMPTY
-  };
+};
 
 enum MASTER_STATE_ENUM {
   MASTER_STATE_IDLE,
@@ -322,25 +325,25 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
 #if defined(DEBUG_DETERMINE_ARRAYS)
   Serial.println("unable homeing function");
 #endif
-automatic_mode_homeing_enable = true;
+  automatic_mode_homeing_enable = true;
 
 #if defined(DEBUG_DETERMINE_ARRAYS)
-Serial.println("Turnoff manual mode fixtures");
+  Serial.println("Turnoff manual mode fixtures");
 #endif
 
-    for (int i = 0; i < 5 ; i++) {
-      automatic_mode_hydraulic_used[i] = 0;
-      automatic_mode_frequency_used[i] = 0;
-    }
-    for (int i = 0; i < 8 ; i++) {
-      automatic_mode_other_used[i] = 0;
-    }
-    
+  for (int i = 0; i < 5 ; i++) {
+    automatic_mode_hydraulic_used[i] = 0;
+    automatic_mode_frequency_used[i] = 0;
+  }
+  for (int i = 0; i < 8 ; i++) {
+    automatic_mode_other_used[i] = 0;
+  }
+
 
   if (!back_to_default) {
 
 #if defined(DEBUG_DETERMINE_ARRAYS)
-Serial.println("Set manual mode functions to 0");
+    Serial.println("Set manual mode functions to 0");
 #endif
 
     for (int i = 0; i < 5 ; i++) {
@@ -350,7 +353,7 @@ Serial.println("Set manual mode functions to 0");
     for (int i = 0; i < 8 ; i++) {
       automatic_mode_other_used[i] = 0;
     }
-    
+
 
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("set hydraulic open");

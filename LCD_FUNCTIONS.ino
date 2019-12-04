@@ -716,7 +716,7 @@ void update_lcd()
               }
 
               if (LCD_BUTTON_UP()) {
-                LCD_SUB_SETTINGS = SUB_SETTINGS_DEFAULT;
+                LCD_SUB_SETTINGS = SUB_SETTINGS_HOMEING;
               } else if (LCD_BUTTON_DOWN()) {
                 LCD_SUB_SETTINGS = SUB_SETTINGS_FREQUENCY_STARTUP_DELAY;
               } else if (LCD_BUTTON_SELECT()) {
@@ -1156,7 +1156,7 @@ void update_lcd()
               break;
 
             case SUB_SETTINGS_ENABLE_EMPTY:
-            
+
               update_var = automatic_mode_other_used[7];
               if (CHECK_UPDATE_LCD()) {
                 lcd_start();
@@ -1195,6 +1195,40 @@ void update_lcd()
 
           break;
         /***************************************************************************************/
+        case SUB_SETTINGS_HOMEING:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Homeing:");
+            lcd.setCursor(0, 1);
+            if (automatic_mode_homeing_enable) {
+
+              lcd.print("Enabled   ");
+            } else if (!automatic_mode_homeing_enable) {
+
+              lcd.print("Disabled");
+            } else {
+
+              lcd.print("ERROR LOADING STATUS");
+            }
+          }
+
+          if (LCD_BUTTON_SELECT()) {
+            automatic_mode_homeing_enable = true;
+            lcd.setCursor(0, 1);
+            lcd.print("Enabled   ");
+          } else if (LCD_BUTTON_STOP()) {
+            automatic_mode_homeing_enable = false;
+            lcd.setCursor(0, 1);
+            lcd.print("Disabled");
+          } else if (LCD_BUTTON_DOWN()) {
+            LCD_SUB_SETTINGS = SUB_SETTINGS_ENABLE_FEATURE;
+          } else if (LCD_BUTTON_UP()) {
+            LCD_SUB_SETTINGS = SUB_SETTINGS_DEFAULT;
+          }
+
+          break;
+        /***************************************************************************************/
         case SUB_SETTINGS_DEFAULT:
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
@@ -1206,7 +1240,7 @@ void update_lcd()
             determine_arrays(true);
 
           } else if (LCD_BUTTON_DOWN()) {
-            LCD_SUB_SETTINGS = SUB_SETTINGS_ENABLE_FEATURE;
+            LCD_SUB_SETTINGS = SUB_SETTINGS_HOMEING;
 
 
           } else if (LCD_BUTTON_STOP()) {

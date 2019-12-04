@@ -201,6 +201,7 @@ void automatic_mode()
       break;
     /*--------------------------------------START------------------------------------*/
     case AUTOMATIC_MODE_START:    // set all back to home position
+
       automatic_mode_state = false;
       lcd.setCursor(0, 1);
       lcd.print("Homeing");
@@ -210,7 +211,7 @@ void automatic_mode()
 
       for (int timer = 0; timer < automatic_homeing_time ; timer++)
       {
-
+       
 #if defined(DEBUG_AUTOMATIC_MODE)
         Serial.print("Timer: ");
         Serial.println(timer);
@@ -348,16 +349,16 @@ void automatic_mode()
 }
 
 void TEST_function() {
-int state = 1;
+  int state = 1;
 
-    for (int i = 1 ; i < 5 ; i ++) {
-      digitalWrite(fase_relay[i], state);
-      digitalWrite(hydraulic_open[i], state);
-      digitalWrite(hydraulic_close[i], state);
-      digitalWrite(frequency_invertor_on_off[i], state);
-      }
-      digitalWrite(small_motor_system, state);
-      digitalWrite(stewardplatform, state);
-      digitalWrite(empty_relay, state);
+  for (int i = 1 ; i < 5 ; i ++) {
+    digitalWrite(fase_relay[i], state);
+    digitalWrite(hydraulic_open[i], state);
+    digitalWrite(hydraulic_close[i], state);
+    digitalWrite(frequency_invertor_on_off[i], state);
+  }
+  digitalWrite(small_motor_system, state);
+  digitalWrite(stewardplatform, state);
+  digitalWrite(empty_relay, state);
 
 }
