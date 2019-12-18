@@ -211,7 +211,7 @@ void automatic_mode()
 
       for (int timer = 0; timer < automatic_homeing_time ; timer++)
       {
-       
+
 #if defined(DEBUG_AUTOMATIC_MODE)
         Serial.print("Timer: ");
         Serial.println(timer);
@@ -347,6 +347,257 @@ void automatic_mode()
   }
 
 }
+
+/************************************************************************************/
+void automatic_mode_2020()
+/************************************************************************************/
+{
+
+  switch (AUTOMATIC_MODE_2020) {
+    /*-----------------------------------------IDLE-----------------------------------*/
+    case AUTOMATIC_MODE_2020_IDLE:
+
+
+      break;
+    /*-----------------------------------------START----------------------------------*/
+    case AUTOMATIC_MODE_2020_START:
+
+      switch (AUTOMATIC_MODE_2020_STARTUP) {
+
+        case AUTOMATIC_MODE_20202_STARTUP_FR1:
+
+          if ((automatic_mode_frequency_used[1] == 1) && (frequency_invertor_state[1] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              set_frequency_inverter(1, true, false);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR2;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR2;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_FR2:
+
+          if ((automatic_mode_frequency_used[2] == 1) && (frequency_invertor_state[2] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              set_frequency_inverter(2, true, false);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR3;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR3;
+
+          }
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_FR3:
+
+          if ((automatic_mode_frequency_used[3] == 1) && (frequency_invertor_state[3] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              set_frequency_inverter(3, true, false);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY1;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY1;
+
+          }
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_RELAY1:
+
+          if ((automatic_mode_other_used[1] == 1) && (relay_state[1] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_relay(1, true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY2;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY2;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_RELAY2:
+
+          if ((automatic_mode_other_used[2] == 1) && (relay_state[2] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_relay(2, true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY3;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY3;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_RELAY3:
+
+          if ((automatic_mode_other_used[3] == 1) && (relay_state[3] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_relay(3, true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY4;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_RELAY4;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_RELAY4:
+
+          if ((automatic_mode_other_used[4] == 1) && (relay_state[4] == 0)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_relay(4, true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_PLATFORM;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_PLATFORM;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_PLATFORM:
+
+          if ((automatic_mode_other_used[5] == 1) && (stewardplatform_state == false)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_stewardplatform(true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_12V;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_12V;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_12V:
+
+          if ((automatic_mode_other_used[6] == 1) && (system_12V_state == false)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_12v_system(true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_EMPTY;
+
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_EMPTY;
+
+          }
+
+          break;
+        case AUTOMATIC_MODE_20202_STARTUP_EMPTY:
+
+          if ((automatic_mode_other_used[7] == 1) && (empty_relay_state == false)) {
+
+            if (automatic_mode_2020_startup_delay_timer == automatic_mode_2020_startup_delay) {
+
+              controle_empty_relay(true);
+              automatic_mode_2020_startup_delay_timer = 0;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR1;
+              AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_RUN;
+            } else {
+              automatic_mode_2020_startup_delay_timer ++;
+
+            }
+          } else {
+
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR1;
+            AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_RUN;
+          }
+
+          break;
+      }
+
+      break;
+    /*------------------------------------------RUN-----------------------------------*/
+    case AUTOMATIC_MODE_2020_RUN:
+
+
+      break;
+    /*-----------------------------------------PAUSE----------------------------------*/
+    case AUTOMATIC_MODE_2020_PAUSE:
+
+      automatic_frequency_inverter_running = false;
+
+      break;
+    /*-----------------------------------------STOP-----------------------------------*/
+    case AUTOMATIC_MODE_2020_STOP:
+
+      automatic_frequency_inverter_running = false;
+      break;
+  }
+
+
+}
+// automatic_mode_hydraulic_used[3] // 1-2-3
+//automatic_mode_frequency_used[1] // 1-2-3
+//automatic_mode_other_used[1] // 1-2-3-4-5-6-7
 
 void TEST_function() {
   int state = 1;

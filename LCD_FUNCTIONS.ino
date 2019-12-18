@@ -58,7 +58,8 @@ void update_lcd()
           /*----       RUN IDLE        ----*/
           if (LCD_BUTTON_SELECT()) {
             LCD_SUB_RUN = SUB_RUN_START;
-            AUTOMATIC_MODE_STATE = AUTOMATIC_MODE_START;    // set state for automatic program
+            // AUTOMATIC_MODE_STATE = AUTOMATIC_MODE_START;    // set state for automatic program
+            AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_START;
           } else if (LCD_BUTTON_UP()) {
             LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
           } else if (LCD_BUTTON_DOWN()) {
@@ -72,10 +73,11 @@ void update_lcd()
             lcd.print("Automatic running");
           }
           /*----       RUN START      ----*/
-          automatic_mode();                      // Run function with program statemachine
+          automatic_mode_2020();                    // Run function with program statemachine
 
-          if (!automatic_mode_state) {
+          if (LCD_BUTTON_STOP()) {
             LCD_SUB_RUN = SUB_RUN_STOP;
+            AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_STOP;
 
           }
 
@@ -427,6 +429,7 @@ void update_lcd()
               controle_12v_system(true);
             } else if (sub_manual_other_component_nr == 7) {
               lcd.print("Empty relay");
+              controle_empty_relay(true);
             }
 
           }
@@ -454,6 +457,7 @@ void update_lcd()
               controle_12v_system(false);
             } else if (sub_manual_other_component_nr == 7) {
               lcd.print("Empty relay");
+              controle_empty_relay(false);
             }
           }
 
@@ -1508,6 +1512,24 @@ void error()
         lcd_start();
         stop_all_hydraulic();
         lcd.print("WRONG STEWARDPLATFORM COMMAND");
+        lcd.setCursor(0, 1);
+        lcd.print("PRESS STOP TO RESET ERROR");
+      }
+
+      if (LCD_BUTTON_STOP()) {
+        state_idle();
+        error_nr = 0;
+        lcd_start();
+        lcd.print("ERROR RESET");
+        delay(2000);
+      }
+      break;
+
+    case 5:
+      if (CHECK_UPDATE_LCD()) {
+        lcd_start();
+        stop_all_hydraulic();
+        lcd.print("WRONG EMPTY RELAY COMMAND");
         lcd.setCursor(0, 1);
         lcd.print("PRESS STOP TO RESET ERROR");
       }

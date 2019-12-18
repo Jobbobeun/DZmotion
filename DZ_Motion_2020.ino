@@ -81,6 +81,7 @@
 #define frequency_invertor_startup_delay_default 15000
 #define automatic_homeing_time_default 300000
 #define automatic_mode_pause_time_default 1000000
+#define automatic_mode_2020_startup_delay 300000
 
 // debug defines
 //#define DEBUG_HYDRAULIC
@@ -106,6 +107,11 @@ int fase_relay_state[5];
 int button_state[5];
 int button_last_state[5];
 int button[5];
+
+int relay_state[5];
+bool stewardplatform_state;
+bool empty_relay_state;
+bool system_12V_state;
 
 // variable check LCD needs to be updated
 int LCD_STATE_OLD;
@@ -152,6 +158,7 @@ int automatic_mode_hydraulic_used[4];
 int automatic_mode_frequency_used[4];
 int automatic_mode_other_used[8];
 bool automatic_mode_homeing_enable;
+long automatic_mode_2020_startup_delay_timer;
 
 // Settings variables
 bool edit_mode = false;
@@ -249,6 +256,29 @@ enum AUTOMATIC_MODE_STATE_ENUM {
   AUTOMATIC_MODE_STOP
 };
 
+enum AUTOMATIC_MODE_2020_ENUM {
+  AUTOMATIC_MODE_2020_IDLE,
+  AUTOMATIC_MODE_2020_START,
+  AUTOMATIC_MODE_2020_RUN,
+  AUTOMATIC_MODE_2020_PAUSE,
+  AUTOMATIC_MODE_2020_STOP
+};
+
+enum AUTOMATIC_MODE_2020_STARTUP_ENUM{
+  AUTOMATIC_MODE_20202_STARTUP_FR1,
+  AUTOMATIC_MODE_20202_STARTUP_FR2,
+  AUTOMATIC_MODE_20202_STARTUP_FR3,
+  AUTOMATIC_MODE_20202_STARTUP_RELAY1,
+  AUTOMATIC_MODE_20202_STARTUP_RELAY2,
+  AUTOMATIC_MODE_20202_STARTUP_RELAY3,
+  AUTOMATIC_MODE_20202_STARTUP_RELAY4,
+  AUTOMATIC_MODE_20202_STARTUP_PLATFORM,
+  AUTOMATIC_MODE_20202_STARTUP_12V,
+  AUTOMATIC_MODE_20202_STARTUP_EMPTY
+};
+
+AUTOMATIC_MODE_2020_STARTUP_ENUM AUTOMATIC_MODE_2020_STARTUP;
+AUTOMATIC_MODE_2020_ENUM AUTOMATIC_MODE_2020;
 LCD_SUB_SETTINGS_ENABLE_ENUM LCD_SUB_SETTINGS_ENABLE;
 LCD_SUB_MANUAL_OTHER_ENUM LCD_SUB_MANUAL_OTHER;
 LCD_SUB_SETTINGS_ENUM LCD_SUB_SETTINGS;
@@ -444,6 +474,22 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
     pinMode(small_motor_system, OUTPUT);
     pinMode(stewardplatform, OUTPUT);
     pinMode(empty_relay, OUTPUT);
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("Relay 1,2,3,4 state 0");
+#endif
+
+    for (int i = 0; i < 6; i++) {
+      relay_state[i] = 0;
+    }
+
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("Set other components false");
+#endif
+    stewardplatform_state = false;
+    empty_relay_state = false;
+    system_12V_state = false;
 
   }
 }
