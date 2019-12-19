@@ -81,7 +81,9 @@
 #define frequency_invertor_startup_delay_default 15000
 #define automatic_homeing_time_default 300000
 #define automatic_mode_pause_time_default 1000000
-#define automatic_mode_2020_startup_delay 300000
+#define automatic_mode_2020_startup_delay 40000
+#define automatic_mode_2020_pause_timer_delay 300000
+#define automatic_mode_2020_pause_flashlight_timer_delay 300000
 
 // debug defines
 //#define DEBUG_HYDRAULIC
@@ -89,6 +91,7 @@
 //#define DEBUG_MANUAL_CONTROLE
 //#define DEBUG_AUTOMATIC_MODE
 #define DEBUG_EEPROM
+#define DEBUG_DETERMINE_ARRAYS
 
 // Global variables
 int frequency_invertor_on_off[4];
@@ -130,6 +133,8 @@ int automatic_homeing_time_old;
 int check_buttons_delay;
 int error_nr_old;
 int sub_manual_other_component_nr_old;
+int AUTOMATIC_MODE_2020_STARTUP_OLD;
+int AUTOMATIC_MODE_2020_OLD;
 
 // LCD variables
 int sub_manual_cylinder_nr = 1;
@@ -159,6 +164,9 @@ int automatic_mode_frequency_used[4];
 int automatic_mode_other_used[8];
 bool automatic_mode_homeing_enable;
 long automatic_mode_2020_startup_delay_timer;
+bool automatic_mode_2020_pause;
+long automatic_mode_2020_pause_timer;
+long automatic_mode_2020_pause_flashlight_timer;
 
 // Settings variables
 bool edit_mode = false;
@@ -264,7 +272,7 @@ enum AUTOMATIC_MODE_2020_ENUM {
   AUTOMATIC_MODE_2020_STOP
 };
 
-enum AUTOMATIC_MODE_2020_STARTUP_ENUM{
+enum AUTOMATIC_MODE_2020_STARTUP_ENUM {
   AUTOMATIC_MODE_20202_STARTUP_FR1,
   AUTOMATIC_MODE_20202_STARTUP_FR2,
   AUTOMATIC_MODE_20202_STARTUP_FR3,
@@ -319,6 +327,7 @@ void loop()
   cycle_state();
   manual_control_valve();
   error();
+
 
   // TEST_function();
 }
@@ -490,6 +499,6 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
     stewardplatform_state = false;
     empty_relay_state = false;
     system_12V_state = false;
-
+    automatic_mode_2020_pause = false;
   }
 }

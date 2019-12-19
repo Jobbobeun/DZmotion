@@ -69,7 +69,8 @@ void update_lcd()
           break;
         case SUB_RUN_START:
           if (CHECK_UPDATE_LCD()) {
-            lcd_start();
+
+            lcd.setCursor(0, 0);
             lcd.print("Automatic running");
           }
           /*----       RUN START      ----*/
@@ -90,7 +91,7 @@ void update_lcd()
             lcd.print("Automatic Stoped");
           }
           /*----       RUN STOP      ----*/
-
+          automatic_mode_2020();
           LCD_SUB_RUN = SUB_RUN_IDLE;
           /*-------------------------------*/
           break;
@@ -1409,33 +1410,75 @@ bool CHECK_UPDATE_LCD()
   // check LCD state is changed
   if (LCD_STATE != LCD_STATE_OLD) {
     LCD_STATE_OLD = LCD_STATE;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (LCD_SUB_RUN != LCD_SUB_RUN_OLD) {
     LCD_SUB_RUN_OLD = LCD_SUB_RUN;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (LCD_SUB_MANUAL_HYDRAULIC != LCD_SUB_MANUAL_HYDRAULIC_OLD) {
     LCD_SUB_MANUAL_HYDRAULIC_OLD = LCD_SUB_MANUAL_HYDRAULIC;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (LCD_SUB_MANUAL_FRQ != LCD_SUB_MANUAL_FRQ_OLD) {
     LCD_SUB_MANUAL_FRQ_OLD = LCD_SUB_MANUAL_FRQ;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (sub_manual_frequency_direction != sub_manual_frequency_direction_old) {
     sub_manual_frequency_direction_old = sub_manual_frequency_direction;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (error_nr != error_nr_old) {
     error_nr_old = error_nr;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (LCD_SUB_SETTINGS != LCD_SUB_SETTINGS_OLD) {
     LCD_SUB_SETTINGS_OLD = LCD_SUB_SETTINGS;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (LCD_SUB_MANUAL_OTHER != LCD_SUB_MANUAL_OTHER_OLD) {
     LCD_SUB_MANUAL_OTHER_OLD = LCD_SUB_MANUAL_OTHER;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (sub_manual_other_component_nr != sub_manual_other_component_nr_old) {
     sub_manual_other_component_nr_old = sub_manual_other_component_nr;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
+    return true;
+  } else if (AUTOMATIC_MODE_2020_STARTUP != AUTOMATIC_MODE_2020_STARTUP_OLD) {
+    AUTOMATIC_MODE_2020_STARTUP_OLD = AUTOMATIC_MODE_2020_STARTUP;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE STARTUP");
+#endif
+    return true;
+  } else if (AUTOMATIC_MODE_2020 != AUTOMATIC_MODE_2020_OLD) {
+    AUTOMATIC_MODE_2020_OLD = AUTOMATIC_MODE_2020;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   } else if (LCD_SUB_SETTINGS_ENABLE != LCD_SUB_SETTINGS_ENABLE_OLD) {
     LCD_SUB_SETTINGS_ENABLE_OLD = LCD_SUB_SETTINGS_ENABLE;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD RETURN TRUE");
+#endif
     return true;
   }
   else {
@@ -1444,6 +1487,7 @@ bool CHECK_UPDATE_LCD()
 
 
 }
+
 
 /************************************************************************************/
 void error()
