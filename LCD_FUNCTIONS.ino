@@ -483,6 +483,8 @@ void update_lcd()
             LCD_STATE = LCD_STATE_MANUAL_HYDRAULIC;
           } else if (LCD_BUTTON_SELECT()) {
             LCD_SUB_SETTINGS = SUB_SETTINGS_AUTOMATIC_STARTUP_DELAY;
+          } else if (LCD_BUTTON_UP()) {
+            LCD_STATE = LCD_STATE_SETTINGS_2020;
           }
 
           break;
@@ -1278,6 +1280,180 @@ void update_lcd()
       }
 
       break;
+    /*---------------------------------------SETTINGS 2020------------------------------------*/
+    case LCD_STATE_SETTINGS_2020:
+
+      switch (LCD_SUB_SETTINGS_2020) {
+
+        case SUB_SETTINGS_2020_IDLE:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Settings 2020");
+          }
+
+
+          if (LCD_BUTTON_DOWN()) {
+            LCD_STATE = LCD_STATE_SETTINGS;
+          } else if (LCD_BUTTON_SELECT()) {
+            LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_START_DELAY;
+          }
+          break;
+
+        case SUB_SETTINGS_2020_START_DELAY:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Startup delay:");
+            lcd.setCursor(0, 1);
+            lcd.print(automatic_mode_2020_startup_delay);
+          }
+
+          if (edit_mode) {
+            if (LCD_BUTTON_UP()) {
+
+              automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay + settings_accuracy;
+              lcd.setCursor(0, 1);
+              lcd.print(automatic_mode_2020_startup_delay);
+
+            }  else if (LCD_BUTTON_DOWN()) {
+
+              automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay - settings_accuracy;
+              lcd.setCursor(0, 1);
+              lcd.print(automatic_mode_2020_startup_delay);
+
+            } else if (LCD_BUTTON_STOP()) {
+
+              edit_mode = false;
+              lcd.noBlink();
+
+            }
+          } else {
+
+            if (LCD_BUTTON_UP()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_FLASHLIGHT_DELAY;
+            } else if (LCD_BUTTON_DOWN()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
+            } else if (LCD_BUTTON_SELECT()) {
+              edit_mode = true;
+              lcd.blink();
+            } else if (LCD_BUTTON_STOP()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_SAVE;
+            }
+          }
+
+          break;
+
+        case SUB_SETTINGS_2020_FLASHLIGHT_DELAY:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Flashlight time:");
+            lcd.setCursor(0, 1);
+            lcd.print(automatic_mode_2020_pause_flashlight_timer_delay);
+          }
+
+          if (edit_mode) {
+            if (LCD_BUTTON_UP()) {
+
+              automatic_mode_2020_pause_flashlight_timer_delay = automatic_mode_2020_pause_flashlight_timer_delay + settings_accuracy;
+              lcd.setCursor(0, 1);
+              lcd.print(automatic_mode_2020_pause_flashlight_timer_delay);
+
+            }  else if (LCD_BUTTON_DOWN()) {
+
+              automatic_mode_2020_pause_flashlight_timer_delay = automatic_mode_2020_pause_flashlight_timer_delay - settings_accuracy;
+              lcd.setCursor(0, 1);
+              lcd.print(automatic_mode_2020_pause_flashlight_timer_delay);
+
+            } else if (LCD_BUTTON_STOP()) {
+
+              edit_mode = false;
+              lcd.noBlink();
+
+            }
+          } else {
+
+            if (LCD_BUTTON_UP()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_PAUSE_DELAY;
+            } else if (LCD_BUTTON_DOWN()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_START_DELAY;
+            } else if (LCD_BUTTON_SELECT()) {
+              edit_mode = true;
+              lcd.blink();
+            } else if (LCD_BUTTON_STOP()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_SAVE;
+            }
+          }
+
+          break;
+
+        case SUB_SETTINGS_2020_PAUSE_DELAY:
+
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Pause time:");
+            lcd.setCursor(0, 1);
+            lcd.print(automatic_mode_2020_pause_timer_delay);
+          }
+
+          if (edit_mode) {
+            if (LCD_BUTTON_UP()) {
+
+              automatic_mode_2020_pause_timer_delay = automatic_mode_2020_pause_timer_delay + settings_accuracy;
+              lcd.setCursor(0, 1);
+              lcd.print(automatic_mode_2020_pause_timer_delay);
+
+            }  else if (LCD_BUTTON_DOWN()) {
+
+              automatic_mode_2020_pause_timer_delay = automatic_mode_2020_pause_timer_delay - settings_accuracy;
+              lcd.setCursor(0, 1);
+              lcd.print(automatic_mode_2020_pause_timer_delay);
+
+            } else if (LCD_BUTTON_STOP()) {
+
+              edit_mode = false;
+              lcd.noBlink();
+
+            }
+          } else {
+
+            if (LCD_BUTTON_DOWN()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_START_DELAY;
+            } else if (LCD_BUTTON_SELECT()) {
+              edit_mode = true;
+              lcd.blink();
+            } else if (LCD_BUTTON_STOP()) {
+              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_SAVE;
+            }
+          }
+
+          break;
+
+        case SUB_SETTINGS_2020_SAVE:
+        
+          if (CHECK_UPDATE_LCD()) {
+            lcd_start();
+            lcd.print("Save press select");
+            lcd.setCursor(0, 1);
+            lcd.print("Back press stop");
+          }
+
+          if (LCD_BUTTON_STOP()) {
+
+            LCD_SUB_SETTINGS = SUB_SETTINGS_IDLE;
+
+          } else if (LCD_BUTTON_SELECT()) {
+
+            update_eeprom();
+            lcd_start();
+            lcd.print("save eeprom");
+          }
+          
+          break;
+
+      }
+      break;
 
   }
 }
@@ -1462,6 +1638,11 @@ bool CHECK_UPDATE_LCD()
     Serial.println("LCD RETURN TRUE");
 #endif
     return true;
+  } else if (LCD_SUB_SETTINGS_2020 != LCD_SUB_SETTINGS_2020_OLD) {
+    LCD_SUB_SETTINGS_2020_OLD = LCD_SUB_SETTINGS_2020;
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("LCD SUB SETTINGS");
+#endif
   } else if (AUTOMATIC_MODE_2020_STARTUP != AUTOMATIC_MODE_2020_STARTUP_OLD) {
     AUTOMATIC_MODE_2020_STARTUP_OLD = AUTOMATIC_MODE_2020_STARTUP;
 #if defined(DEBUG_DETERMINE_ARRAYS)

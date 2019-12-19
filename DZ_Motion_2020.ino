@@ -72,7 +72,9 @@
 #define eeprom_automatic_mode_other_12V 35 // 1 position needed
 #define eeprom_automatic_mode_other_empty 36 // 1 position needed
 #define eeprom_automatic_mode_homing_enable 37 // 1 position needed
-
+#define eeprom_automatic_mode_2020_pause_flashlight_timer_delay 38 // 4 positions needed
+#define eeprom_automatic_mode_2020_pause_timer_delay 42 // 4 positions needed
+#define eeprom_automatic_mode_2020_startup_delay 46 // 4 positions needed
 
 // default values
 #define hydraulic_valve_1_time_default 30000
@@ -81,17 +83,17 @@
 #define frequency_invertor_startup_delay_default 15000
 #define automatic_homeing_time_default 300000
 #define automatic_mode_pause_time_default 1000000
-#define automatic_mode_2020_startup_delay 40000
-#define automatic_mode_2020_pause_timer_delay 300000
-#define automatic_mode_2020_pause_flashlight_timer_delay 300000
+#define automatic_mode_2020_startup_delay_default 40000
+#define automatic_mode_2020_pause_timer_delay_default 300000
+#define automatic_mode_2020_pause_flashlight_timer_delay_default 300000
 
 // debug defines
 //#define DEBUG_HYDRAULIC
-#define DEBUG_DETERMINE_ARRAYS
+//#define DEBUG_DETERMINE_ARRAYS
 //#define DEBUG_MANUAL_CONTROLE
 //#define DEBUG_AUTOMATIC_MODE
-#define DEBUG_EEPROM
-#define DEBUG_DETERMINE_ARRAYS
+//#define DEBUG_EEPROM
+//#define DEBUG_DETERMINE_ARRAYS
 
 // Global variables
 int frequency_invertor_on_off[4];
@@ -135,6 +137,10 @@ int error_nr_old;
 int sub_manual_other_component_nr_old;
 int AUTOMATIC_MODE_2020_STARTUP_OLD;
 int AUTOMATIC_MODE_2020_OLD;
+long automatic_mode_2020_startup_delay;
+long automatic_mode_2020_pause_timer_delay;
+long automatic_mode_2020_pause_flashlight_timer_delay;
+int LCD_SUB_SETTINGS_2020_OLD;
 
 // LCD variables
 int sub_manual_cylinder_nr = 1;
@@ -181,7 +187,8 @@ enum LCD_STATE_ENUM {
   LCD_STATE_MANUAL_HYDRAULIC,
   LCD_STATE_MANUAL_FREQUENCY_INVERTER,
   LCD_STATE_MANUAL_OTHER,
-  LCD_STATE_SETTINGS
+  LCD_STATE_SETTINGS,
+  LCD_STATE_SETTINGS_2020
 };
 
 enum LCD_SUB_START_ENUM {
@@ -220,6 +227,13 @@ enum LCD_SUB_SETTINGS_ENUM {
   SUB_SETTINGS_HOMEING,
   SUB_SETTINGS_DEFAULT,
   SUB_SETTINGS_SAVE
+};
+enum LCD_SUB_SETTINGS_2020_ENUM{
+  SUB_SETTINGS_2020_IDLE,
+  SUB_SETTINGS_2020_START_DELAY,
+  SUB_SETTINGS_2020_FLASHLIGHT_DELAY,
+  SUB_SETTINGS_2020_PAUSE_DELAY,
+  SUB_SETTINGS_2020_SAVE
 };
 
 enum LCD_SUB_SETTINGS_ENABLE_ENUM {
@@ -284,7 +298,7 @@ enum AUTOMATIC_MODE_2020_STARTUP_ENUM {
   AUTOMATIC_MODE_20202_STARTUP_12V,
   AUTOMATIC_MODE_20202_STARTUP_EMPTY
 };
-
+LCD_SUB_SETTINGS_2020_ENUM LCD_SUB_SETTINGS_2020;
 AUTOMATIC_MODE_2020_STARTUP_ENUM AUTOMATIC_MODE_2020_STARTUP;
 AUTOMATIC_MODE_2020_ENUM AUTOMATIC_MODE_2020;
 LCD_SUB_SETTINGS_ENABLE_ENUM LCD_SUB_SETTINGS_ENABLE;
@@ -378,6 +392,13 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
     automatic_mode_other_used[i] = 0;
   }
 
+#if defined(DEBUG_DETERMINE_ARRAYS)
+Serial.println("Default autmaticmode 2020");
+#endif
+
+automatic_mode_2020_pause_flashlight_timer_delay = automatic_mode_2020_pause_flashlight_timer_delay_default;
+automatic_mode_2020_pause_timer_delay = automatic_mode_2020_pause_timer_delay_default;
+automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay_default;
 
   if (!back_to_default) {
 
