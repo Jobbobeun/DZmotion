@@ -653,9 +653,7 @@ void automatic_mode_2020()
 
 
 }
-// automatic_mode_hydraulic_used[3] // 1-2-3
-//automatic_mode_frequency_used[1] // 1-2-3
-//automatic_mode_other_used[1] // 1-2-3-4-5-6-7
+
 
 void TEST_function() {
   int state = 1;

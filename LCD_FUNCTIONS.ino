@@ -1332,9 +1332,7 @@ void update_lcd()
 
             if (LCD_BUTTON_UP()) {
               LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_FLASHLIGHT_DELAY;
-            } else if (LCD_BUTTON_DOWN()) {
-              LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
-            } else if (LCD_BUTTON_SELECT()) {
+            }  else if (LCD_BUTTON_SELECT()) {
               edit_mode = true;
               lcd.blink();
             } else if (LCD_BUTTON_STOP()) {
@@ -1441,13 +1439,14 @@ void update_lcd()
 
           if (LCD_BUTTON_STOP()) {
 
-            LCD_SUB_SETTINGS = SUB_SETTINGS_IDLE;
+        LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
 
           } else if (LCD_BUTTON_SELECT()) {
 
             update_eeprom();
             lcd_start();
             lcd.print("save eeprom");
+           
           }
           
           break;
