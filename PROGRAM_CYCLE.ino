@@ -367,6 +367,8 @@ void automatic_mode_2020()
         lcd.setCursor(0, 1);
         lcd.print("Start:");
       }
+      
+      controle_light_controle(2, true);
 
       switch (AUTOMATIC_MODE_2020_STARTUP) {
 
@@ -614,6 +616,7 @@ void automatic_mode_2020()
       if (LCD_BUTTON_PAUSE()) {
         controle_empty_relay(true);
         AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_PAUSE;
+        controle_light_controle(3, true);
       }
 
       break;
@@ -647,6 +650,7 @@ void automatic_mode_2020()
     case AUTOMATIC_MODE_2020_STOP:
 
       stop_all();
+      controle_light_controle(1, true);
       AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_IDLE;
       break;
   }

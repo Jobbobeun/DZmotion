@@ -8,6 +8,7 @@
 #include <LiquidCrystal_PCF8574.h>
 #include <EEPROM.h>
 
+// Define pins
 #define frequency_invertor_1_on_off 22
 #define frequency_invertor_1_direction 24
 #define frequency_invertor_1_speed 2
@@ -40,6 +41,12 @@
 #define button_select 35
 #define button_stop 37
 #define button_pause 39
+
+#define controle_light_run 47
+#define controle_light_stop 45
+#define controle_light_pause 43
+
+// Define software numbers
 #define up 0
 #define down 1
 #define select 2
@@ -228,7 +235,7 @@ enum LCD_SUB_SETTINGS_ENUM {
   SUB_SETTINGS_DEFAULT,
   SUB_SETTINGS_SAVE
 };
-enum LCD_SUB_SETTINGS_2020_ENUM{
+enum LCD_SUB_SETTINGS_2020_ENUM {
   SUB_SETTINGS_2020_IDLE,
   SUB_SETTINGS_2020_START_DELAY,
   SUB_SETTINGS_2020_FLASHLIGHT_DELAY,
@@ -326,6 +333,7 @@ void setup()
   LCD_LIGHT_ON();
   Serial.begin(115200);
   determine_arrays(false);
+  controle_light_controle(1, true); // set controle light stop
   load_eeprom();
 
 
@@ -393,12 +401,12 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
   }
 
 #if defined(DEBUG_DETERMINE_ARRAYS)
-Serial.println("Default autmaticmode 2020");
+  Serial.println("Default autmaticmode 2020");
 #endif
 
-automatic_mode_2020_pause_flashlight_timer_delay = automatic_mode_2020_pause_flashlight_timer_delay_default;
-automatic_mode_2020_pause_timer_delay = automatic_mode_2020_pause_timer_delay_default;
-automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay_default;
+  automatic_mode_2020_pause_flashlight_timer_delay = automatic_mode_2020_pause_flashlight_timer_delay_default;
+  automatic_mode_2020_pause_timer_delay = automatic_mode_2020_pause_timer_delay_default;
+  automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay_default;
 
   if (!back_to_default) {
 
@@ -504,6 +512,15 @@ automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay_default;
     pinMode(small_motor_system, OUTPUT);
     pinMode(stewardplatform, OUTPUT);
     pinMode(empty_relay, OUTPUT);
+
+
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.println("set controle lights");
+#endif
+    pinMode(controle_light_stop, OUTPUT);
+    pinMode(controle_light_run, OUTPUT);
+    pinMode(controle_light_pause, OUTPUT);
+
 
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("Relay 1,2,3,4 state 0");

@@ -1429,7 +1429,7 @@ void update_lcd()
           break;
 
         case SUB_SETTINGS_2020_SAVE:
-        
+
           if (CHECK_UPDATE_LCD()) {
             lcd_start();
             lcd.print("Save press select");
@@ -1439,16 +1439,16 @@ void update_lcd()
 
           if (LCD_BUTTON_STOP()) {
 
-        LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
+            LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
 
           } else if (LCD_BUTTON_SELECT()) {
 
             update_eeprom();
             lcd_start();
             lcd.print("save eeprom");
-           
+            LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
           }
-          
+
           break;
 
       }
@@ -1642,6 +1642,7 @@ bool CHECK_UPDATE_LCD()
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("LCD SUB SETTINGS");
 #endif
+    return true;
   } else if (AUTOMATIC_MODE_2020_STARTUP != AUTOMATIC_MODE_2020_STARTUP_OLD) {
     AUTOMATIC_MODE_2020_STARTUP_OLD = AUTOMATIC_MODE_2020_STARTUP;
 #if defined(DEBUG_DETERMINE_ARRAYS)
@@ -1674,7 +1675,7 @@ void error()
 /************************************************************************************/
 {
   // stop all
-
+  controle_light_controle(4, true); // turn on al the controle lights
   switch (error_nr) {
 
     case 1:
@@ -1784,5 +1785,8 @@ void state_idle()
   MASTER_STATE = MASTER_STATE_IDLE;
   MANUAL_CONTROLE_VALVE_STATE = MANUAL_CONTROLE_VALVE_IDLE;
   AUTOMATIC_MODE_STATE = AUTOMATIC_MODE_IDLE;
+  LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
+  
+  controle_light_controle(4, false); // turn off al controle lights
 
 }
