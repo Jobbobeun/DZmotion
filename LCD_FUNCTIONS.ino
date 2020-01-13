@@ -1645,6 +1645,7 @@ bool CHECK_UPDATE_LCD()
     return true;
   } else if (AUTOMATIC_MODE_2020_STARTUP != AUTOMATIC_MODE_2020_STARTUP_OLD) {
     AUTOMATIC_MODE_2020_STARTUP_OLD = AUTOMATIC_MODE_2020_STARTUP;
+    AUTOMATIC_MODE_2020_LCD_UPDATE = false;
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("LCD RETURN TRUE STARTUP");
 #endif
@@ -1654,6 +1655,7 @@ bool CHECK_UPDATE_LCD()
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.println("LCD RETURN TRUE");
 #endif
+    AUTOMATIC_MODE_2020_LCD_UPDATE = false;
     return true;
   } else if (LCD_SUB_SETTINGS_ENABLE != LCD_SUB_SETTINGS_ENABLE_OLD) {
     LCD_SUB_SETTINGS_ENABLE_OLD = LCD_SUB_SETTINGS_ENABLE;
@@ -1675,11 +1677,12 @@ void error()
 /************************************************************************************/
 {
   // stop all
-  controle_light_controle(4, true); // turn on al the controle lights
+  
   switch (error_nr) {
 
     case 1:
       if (CHECK_UPDATE_LCD()) {
+        controle_light_controle(4, true); // turn on al the controle lights
         lcd_start();
         stop_all_hydraulic();
         lcd.print("Troggel Hydraulic direction");
@@ -1698,6 +1701,7 @@ void error()
 
     case 2:
       if (CHECK_UPDATE_LCD()) {
+        controle_light_controle(4, true); // turn on al the controle lights
         lcd_start();
         stop_all_hydraulic();
         lcd.print("WRONG 12V SYSTEM COMMAND");
@@ -1716,6 +1720,7 @@ void error()
 
     case 3:
       if (CHECK_UPDATE_LCD()) {
+        controle_light_controle(4, true); // turn on al the controle lights
         lcd_start();
         stop_all_hydraulic();
         lcd.print("WRONG 3 FASE RELAY COMMAND");
@@ -1734,6 +1739,7 @@ void error()
 
     case 4:
       if (CHECK_UPDATE_LCD()) {
+        controle_light_controle(4, true); // turn on al the controle lights
         lcd_start();
         stop_all_hydraulic();
         lcd.print("WRONG STEWARDPLATFORM COMMAND");
@@ -1752,6 +1758,7 @@ void error()
 
     case 5:
       if (CHECK_UPDATE_LCD()) {
+        controle_light_controle(4, true); // turn on al the controle lights
         lcd_start();
         stop_all_hydraulic();
         lcd.print("WRONG EMPTY RELAY COMMAND");
@@ -1786,7 +1793,7 @@ void state_idle()
   MANUAL_CONTROLE_VALVE_STATE = MANUAL_CONTROLE_VALVE_IDLE;
   AUTOMATIC_MODE_STATE = AUTOMATIC_MODE_IDLE;
   LCD_SUB_SETTINGS_2020 = SUB_SETTINGS_2020_IDLE;
-  
+
   controle_light_controle(4, false); // turn off al controle lights
 
 }

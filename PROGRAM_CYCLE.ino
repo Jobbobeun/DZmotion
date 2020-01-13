@@ -362,22 +362,26 @@ void automatic_mode_2020()
     /*-----------------------------------------START----------------------------------*/
     case AUTOMATIC_MODE_2020_START:
 
-      if (CHECK_UPDATE_LCD()) {
+      if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
 
         lcd.setCursor(0, 1);
         lcd.print("Start:");
+        AUTOMATIC_MODE_2020_LCD_UPDATE = true;
       }
-      
+
       controle_light_controle(2, true);
 
       switch (AUTOMATIC_MODE_2020_STARTUP) {
 
+        case AUTOMATIC_MODE_20202_STARTUP_FIRST_RUN:                                    // needs to be tested
+          automatic_mode_2020_startup_delay_timer = automatic_mode_2020_startup_delay;
+
         case AUTOMATIC_MODE_20202_STARTUP_FR1:
 
-          if (CHECK_UPDATE_LCD()) {
-            Serial.println("LCD SET");
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Frequency inverter1");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
 
           if ((automatic_mode_frequency_used[1] == 1) && (frequency_invertor_state[1] == 0)) {
@@ -399,10 +403,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_FR2:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Frequency inverter2");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_frequency_used[2] == 1) && (frequency_invertor_state[2] == 0)) {
 
@@ -422,10 +428,12 @@ void automatic_mode_2020()
 
           }
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_FR3:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Frequency inverter3");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_frequency_used[3] == 1) && (frequency_invertor_state[3] == 0)) {
 
@@ -445,10 +453,12 @@ void automatic_mode_2020()
 
           }
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_RELAY1:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Relay 1");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[1] == 1) && (relay_state[1] == 0)) {
 
@@ -469,10 +479,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_RELAY2:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Relay 2");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[2] == 1) && (relay_state[2] == 0)) {
 
@@ -493,10 +505,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_RELAY3:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Relay 3");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[3] == 1) && (relay_state[3] == 0)) {
 
@@ -517,10 +531,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_RELAY4:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Relay 4");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[4] == 1) && (relay_state[4] == 0)) {
 
@@ -541,10 +557,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_PLATFORM:     // used without timer
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Stewartplatform");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[5] == 1) && (stewardplatform_state == false)) {
 
@@ -560,10 +578,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_12V:            // used without timer
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Start 12V system ");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[6] == 1) && (system_12V_state == false)) {
 
@@ -580,10 +600,12 @@ void automatic_mode_2020()
           }
 
           break;
+
         case AUTOMATIC_MODE_20202_STARTUP_EMPTY:
-          if (CHECK_UPDATE_LCD()) {
+          if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
             lcd.setCursor(0, 2);
             lcd.print("Start Empty relay");
+            AUTOMATIC_MODE_2020_LCD_UPDATE = true;
           }
           if ((automatic_mode_other_used[7] == 1) && (empty_relay_state == false)) {
 
@@ -591,7 +613,7 @@ void automatic_mode_2020()
 
               controle_empty_relay(true);
               automatic_mode_2020_startup_delay_timer = 0;
-              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR1;
+              AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FIRST_RUN;
               AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_RUN;
             } else {
               automatic_mode_2020_startup_delay_timer ++;
@@ -599,7 +621,7 @@ void automatic_mode_2020()
             }
           } else {
 
-            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FR1;
+            AUTOMATIC_MODE_2020_STARTUP = AUTOMATIC_MODE_20202_STARTUP_FIRST_RUN;
             AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_RUN;
           }
 
@@ -609,22 +631,25 @@ void automatic_mode_2020()
       break;
     /*------------------------------------------RUN-----------------------------------*/
     case AUTOMATIC_MODE_2020_RUN:
-      if (CHECK_UPDATE_LCD()) {
+      if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
         lcd.setCursor(0, 2);
         lcd.print("Wait for pause signa");
+        AUTOMATIC_MODE_2020_LCD_UPDATE = true;
       }
       if (LCD_BUTTON_PAUSE()) {
         controle_empty_relay(true);
         AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_PAUSE;
         controle_light_controle(3, true);
+        horn_state = true; // set horn on
       }
 
       break;
     /*-----------------------------------------PAUSE----------------------------------*/
     case AUTOMATIC_MODE_2020_PAUSE:
-      if (CHECK_UPDATE_LCD()) {
+      if (!AUTOMATIC_MODE_2020_LCD_UPDATE) {
         lcd.setCursor(0, 2);
         lcd.print("Pause               ");
+        AUTOMATIC_MODE_2020_LCD_UPDATE = true;
       }
       if (automatic_mode_2020_pause_flashlight_timer == automatic_mode_2020_pause_flashlight_timer_delay) {
         if (!automatic_mode_2020_pause) {
@@ -643,7 +668,7 @@ void automatic_mode_2020()
       } else {
         automatic_mode_2020_pause_flashlight_timer ++;
       }
-
+      horn();
 
       break;
     /*-----------------------------------------STOP-----------------------------------*/

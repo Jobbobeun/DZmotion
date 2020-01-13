@@ -57,6 +57,8 @@
 #define large_number_time_delay 6
 #define settings_accuracy 500
 #define other_components_amount 7
+#define horn_amount 5
+#define horn_timer 15000
 
 // define eeprom addresses
 #define eeprom_automatic_homeing_time 0 // 4 positions needed
@@ -89,18 +91,19 @@
 #define hydraulic_valve_3_time_default 30000
 #define frequency_invertor_startup_delay_default 15000
 #define automatic_homeing_time_default 300000
-#define automatic_mode_pause_time_default 1000000
-#define automatic_mode_2020_startup_delay_default 40000
-#define automatic_mode_2020_pause_timer_delay_default 300000
-#define automatic_mode_2020_pause_flashlight_timer_delay_default 300000
+#define automatic_mode_pause_time_default 500000
+#define automatic_mode_2020_startup_delay_default 10000
+#define automatic_mode_2020_pause_timer_delay_default 100000
+#define automatic_mode_2020_pause_flashlight_timer_delay_default 100000
 
 // debug defines
-//#define DEBUG_HYDRAULIC
-//#define DEBUG_DETERMINE_ARRAYS
-//#define DEBUG_MANUAL_CONTROLE
-//#define DEBUG_AUTOMATIC_MODE
-//#define DEBUG_EEPROM
-//#define DEBUG_DETERMINE_ARRAYS
+// #define DEBUG_HYDRAULIC
+// #define DEBUG_DETERMINE_ARRAYS
+// #define DEBUG_MANUAL_CONTROLE
+// #define DEBUG_AUTOMATIC_MODE
+// #define DEBUG_EEPROM
+// #define DEBUG_DETERMINE_ARRAYS
+// #define DEBUG_CONTROLE_LIGHTS
 
 // Global variables
 int frequency_invertor_on_off[4];
@@ -180,12 +183,20 @@ long automatic_mode_2020_startup_delay_timer;
 bool automatic_mode_2020_pause;
 long automatic_mode_2020_pause_timer;
 long automatic_mode_2020_pause_flashlight_timer;
+bool AUTOMATIC_MODE_2020_LCD_UPDATE;
 
 // Settings variables
 bool edit_mode = false;
 
 // Test function
 int counter_test;
+
+// horn variables
+bool horn_state;
+bool horn_on_off;
+int horn_counter;
+long horn_timer_counter;
+
 
 // Enum state machine
 enum LCD_STATE_ENUM {
@@ -294,6 +305,7 @@ enum AUTOMATIC_MODE_2020_ENUM {
 };
 
 enum AUTOMATIC_MODE_2020_STARTUP_ENUM {
+  AUTOMATIC_MODE_20202_STARTUP_FIRST_RUN,
   AUTOMATIC_MODE_20202_STARTUP_FR1,
   AUTOMATIC_MODE_20202_STARTUP_FR2,
   AUTOMATIC_MODE_20202_STARTUP_FR3,
@@ -305,6 +317,7 @@ enum AUTOMATIC_MODE_2020_STARTUP_ENUM {
   AUTOMATIC_MODE_20202_STARTUP_12V,
   AUTOMATIC_MODE_20202_STARTUP_EMPTY
 };
+
 LCD_SUB_SETTINGS_2020_ENUM LCD_SUB_SETTINGS_2020;
 AUTOMATIC_MODE_2020_STARTUP_ENUM AUTOMATIC_MODE_2020_STARTUP;
 AUTOMATIC_MODE_2020_ENUM AUTOMATIC_MODE_2020;
@@ -346,7 +359,6 @@ void loop()
 
   check_buttons();
   update_lcd();
-  cycle_state();
   manual_control_valve();
   error();
 
