@@ -43,6 +43,7 @@ void update_eeprom()
   EEPROMWritelong(eeprom_automatic_mode_2020_pause_flashlight_timer_delay, automatic_mode_2020_pause_flashlight_timer_delay);
   EEPROMWritelong(eeprom_automatic_mode_2020_pause_timer_delay, automatic_mode_2020_pause_timer_delay);
   EEPROMWritelong(eeprom_automatic_mode_2020_startup_delay, automatic_mode_2020_startup_delay);
+  EEPROMWritelong(eeprom_automatic_mode_2020_smoke_time, automatic_mode_2020_smoke_time);
   EEPROM.write(eeprom_automatic_mode_hydraulic_1, automatic_mode_hydraulic_used[1]);
   EEPROM.write(eeprom_automatic_mode_hydraulic_2, automatic_mode_hydraulic_used[2]);
   EEPROM.write(eeprom_automatic_mode_hydraulic_3, automatic_mode_hydraulic_used[3]);
@@ -57,6 +58,7 @@ void update_eeprom()
   EEPROM.write(eeprom_automatic_mode_other_12V, automatic_mode_other_used[6]);
   EEPROM.write(eeprom_automatic_mode_other_empty, automatic_mode_other_used[7]);
   EEPROM.write(eeprom_automatic_mode_homing_enable,automatic_mode_homeing_enable);
+ 
 }
 
 /************************************************************************************/
@@ -164,5 +166,11 @@ automatic_mode_2020_startup_delay = EEPROMReadlong(eeprom_automatic_mode_2020_st
 #if defined(DEBUG_DETERMINE_ARRAYS)
     Serial.print("Load automatic mode startup delay"); Serial.println(automatic_mode_2020_startup_delay);
 #endif
+
+automatic_mode_2020_smoke_time = EEPROMReadlong(eeprom_automatic_mode_2020_smoke_time);
+#if defined(DEBUG_DETERMINE_ARRAYS)
+    Serial.print("Load automatic mode smoke time"); Serial.println(automatic_mode_2020_smoke_time);
+#endif
+
   }
 }

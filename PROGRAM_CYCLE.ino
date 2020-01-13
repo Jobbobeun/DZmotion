@@ -640,7 +640,7 @@ void automatic_mode_2020()
         controle_empty_relay(true);
         AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_PAUSE;
         controle_light_controle(3, true);
-        horn_state = true; // set horn on
+
       }
 
       break;
@@ -654,21 +654,28 @@ void automatic_mode_2020()
       if (automatic_mode_2020_pause_flashlight_timer == automatic_mode_2020_pause_flashlight_timer_delay) {
         if (!automatic_mode_2020_pause) {
           stop_all();
+          
           automatic_mode_2020_pause = true;
         }
+
+
 
         if (automatic_mode_2020_pause_timer == automatic_mode_2020_pause_timer_delay) {
           AUTOMATIC_MODE_2020 = AUTOMATIC_MODE_2020_START;
           automatic_mode_2020_pause_timer = 0;
           automatic_mode_2020_pause_flashlight_timer = 0;
           automatic_mode_2020_pause = false;
+          horn_state = true; // set horn on
         } else {
           automatic_mode_2020_pause_timer++;
         }
       } else {
         automatic_mode_2020_pause_flashlight_timer ++;
+        if ((automatic_mode_2020_pause_flashlight_timer > (automatic_mode_2020_pause_flashlight_timer_delay / 2)) && (smoke_state == false)) {
+          smoke_state = true;
+        }
       }
-      horn();
+      
 
       break;
     /*-----------------------------------------STOP-----------------------------------*/

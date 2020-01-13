@@ -62,10 +62,25 @@ void controle_empty_relay(bool state)
 }
 
 /************************************************************************************/
-void smoke(bool state)
+void smoke()
 /************************************************************************************/
 {
+  if (smoke_state) {
+    if (smoke_state_onoff == false) {
+      digitalWrite(hydraulic_close[1], HIGH);
+      smoke_state_onoff = true;
+    }
 
+    if (smoke_counter == automatic_mode_2020_smoke_time) {
+      smoke_state = false;
+      digitalWrite(hydraulic_close[1], LOW);
+      smoke_state_onoff = false;
+      smoke_counter = 0;
+    } else {
+      smoke_counter++;
+    }
+
+  }
 }
 
 /************************************************************************************/
@@ -129,6 +144,7 @@ void horn()
       horn_state = false;
       horn_counter = 0;
       digitalWrite(hydraulic_open[1], LOW);
+      horn_once = true;
     } else {
 
       if (horn_timer_counter == horn_timer) {
@@ -145,6 +161,12 @@ void horn()
       } else {
 
         horn_timer_counter ++;
+        
+        if (horn_once){
+          horn_once = false;
+          digitalWrite(hydraulic_open[1], HIGH);
+          horn_on_off = true;
+        }
 
       }
 

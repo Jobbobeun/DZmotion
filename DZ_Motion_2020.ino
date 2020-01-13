@@ -58,7 +58,7 @@
 #define settings_accuracy 500
 #define other_components_amount 7
 #define horn_amount 5
-#define horn_timer 15000
+#define horn_timer 25000
 
 // define eeprom addresses
 #define eeprom_automatic_homeing_time 0 // 4 positions needed
@@ -84,6 +84,7 @@
 #define eeprom_automatic_mode_2020_pause_flashlight_timer_delay 38 // 4 positions needed
 #define eeprom_automatic_mode_2020_pause_timer_delay 42 // 4 positions needed
 #define eeprom_automatic_mode_2020_startup_delay 46 // 4 positions needed
+#define eeprom_automatic_mode_2020_smoke_time 50 // 4 positions needed
 
 // default values
 #define hydraulic_valve_1_time_default 30000
@@ -93,8 +94,9 @@
 #define automatic_homeing_time_default 300000
 #define automatic_mode_pause_time_default 500000
 #define automatic_mode_2020_startup_delay_default 10000
-#define automatic_mode_2020_pause_timer_delay_default 100000
+#define automatic_mode_2020_pause_timer_delay_default 250000
 #define automatic_mode_2020_pause_flashlight_timer_delay_default 100000
+#define automatic_mode_2020_smoke_time_default 300000
 
 // debug defines
 // #define DEBUG_HYDRAULIC
@@ -152,6 +154,7 @@ long automatic_mode_2020_pause_timer_delay;
 long automatic_mode_2020_pause_flashlight_timer_delay;
 int LCD_SUB_SETTINGS_2020_OLD;
 
+
 // LCD variables
 int sub_manual_cylinder_nr = 1;
 int sub_manual_frequency_nr = 1;
@@ -185,6 +188,12 @@ long automatic_mode_2020_pause_timer;
 long automatic_mode_2020_pause_flashlight_timer;
 bool AUTOMATIC_MODE_2020_LCD_UPDATE;
 
+// smoke variables
+long automatic_mode_2020_smoke_time;
+bool smoke_state;
+bool smoke_state_onoff;
+long smoke_counter;
+
 // Settings variables
 bool edit_mode = false;
 
@@ -196,6 +205,7 @@ bool horn_state;
 bool horn_on_off;
 int horn_counter;
 long horn_timer_counter;
+bool horn_once;
 
 
 // Enum state machine
@@ -251,6 +261,7 @@ enum LCD_SUB_SETTINGS_2020_ENUM {
   SUB_SETTINGS_2020_START_DELAY,
   SUB_SETTINGS_2020_FLASHLIGHT_DELAY,
   SUB_SETTINGS_2020_PAUSE_DELAY,
+  SUB_SETTINGS_2020_SMOKE,
   SUB_SETTINGS_2020_SAVE
 };
 
@@ -419,6 +430,7 @@ void determine_arrays(bool back_to_default)   // Set all pins to array new outpu
   automatic_mode_2020_pause_flashlight_timer_delay = automatic_mode_2020_pause_flashlight_timer_delay_default;
   automatic_mode_2020_pause_timer_delay = automatic_mode_2020_pause_timer_delay_default;
   automatic_mode_2020_startup_delay = automatic_mode_2020_startup_delay_default;
+  automatic_mode_2020_smoke_time = automatic_mode_2020_smoke_time_default;
 
   if (!back_to_default) {
 
