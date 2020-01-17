@@ -654,7 +654,7 @@ void automatic_mode_2020()
       if (automatic_mode_2020_pause_flashlight_timer == automatic_mode_2020_pause_flashlight_timer_delay) {
         if (!automatic_mode_2020_pause) {
           stop_all();
-          
+
           automatic_mode_2020_pause = true;
         }
 
@@ -674,8 +674,12 @@ void automatic_mode_2020()
         if ((automatic_mode_2020_pause_flashlight_timer > (automatic_mode_2020_pause_flashlight_timer_delay / 2)) && (smoke_state == false)) {
           smoke_state = true;
         }
+        if ((automatic_mode_2020_pause_flashlight_timer > ((automatic_mode_2020_pause_flashlight_timer_delay * 3) / 2)) && (stewardplatform_state == true)) { // Needs to be checked if this works
+          controle_stewardplatform(false);
+        }
+
       }
-      
+
 
       break;
     /*-----------------------------------------STOP-----------------------------------*/
@@ -690,8 +694,10 @@ void automatic_mode_2020()
 
 }
 
-
-void TEST_function() {
+/************************************************************************************/
+void TEST_function() 
+/************************************************************************************/
+{
   int state = 1;
 
   for (int i = 1 ; i < 5 ; i ++) {
@@ -706,7 +712,10 @@ void TEST_function() {
 
 }
 
-void stop_all() {
+/************************************************************************************/
+void stop_all() 
+/************************************************************************************/
+{
 
   for (int i = 0; i < 5 ; i++) {
     if (frequency_invertor_state[i] == 1) {
